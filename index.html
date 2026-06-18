@@ -14,7 +14,6 @@ body { font-family: 'Segoe UI', sans-serif; }
 </style>
 </head>
 <body class="bg-gray-50">
-
 <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
   <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
     <h1 class="text-3xl font-bold text-center mb-2">PCS Admin Portal</h1>
@@ -49,10 +48,13 @@ body { font-family: 'Segoe UI', sans-serif; }
   </nav>
 
   <div class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Upload Section -->
     <div class="bg-white rounded-2xl shadow p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4">Upload Questions (JSON Array)</h2>
-      <textarea id="uploadJson" rows="8" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm" placeholder='Paste your JSON array here...'></textarea>
-      <button onclick="uploadQuestions()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium">Upload Questions</button>
+      <h2 class="text-xl font-semibold mb-4">Upload / Edit Questions (JSON Array)</h2>
+      <textarea id="uploadJson" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm" placeholder='Paste your JSON array here...'></textarea>
+      <button onclick="uploadQuestions()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium">
+        Upload / Re-upload Questions
+      </button>
     </div>
 
     <div class="flex justify-between items-center mb-4">
@@ -61,10 +63,12 @@ body { font-family: 'Segoe UI', sans-serif; }
         <i class="fas fa-refresh"></i> Refresh
       </button>
     </div>
+
     <div id="questionsList" class="space-y-4"></div>
   </div>
 </div>
 
+<!-- Edit Single Question Modal -->
 <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
     <div class="p-6 border-b">
@@ -88,7 +92,7 @@ async function login() {
   const admin_id = document.getElementById('admin_id').value.trim();
   const admin_pass = document.getElementById('admin_pass').value.trim();
   if (!admin_id || !admin_pass) return alert("Please enter Admin ID and Password");
-
+  
   try {
     const res = await fetch(`${API_BASE}/api/login`, {
       method: 'POST',
@@ -124,17 +128,52 @@ function getHeaders() {
   };
 }
 
+// ====================== NEW: Edit Entire Batch ======================
+async function editBatch(batchId) {
+  if (!confirm(`Edit entire batch ${batchId}?`)) return;
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/batch/${batchId}/full`, {
+      headers: getHeaders()
+    });
+    
+    if (!res.ok) {
+      const err = await res.json();
+      return alert(err.error || 'Failed to fetch batch');
+    }
+    
+    const data = await res.json();
+    
+    // Populate the upload textarea with clean JSON
+    document.getElementById('uploadJson').value = JSON.stringify(data.questions, null, 2);
+    
+    alert(`✅ Batch ${batchId} loaded for editing!\n\nYou can now edit the JSON and click "Upload / Re-upload Questions"`);
+    
+    // Scroll to upload section
+    document.getElementById('uploadJson').scrollIntoView({ behavior: 'smooth' });
+    
+  } catch (err) {
+    alert('Error loading batch for editing');
+    console.error(err);
+  }
+}
+
+// ====================== Existing Functions ======================
+
 async function uploadQuestions() {
   const jsonText = document.getElementById('uploadJson').value.trim();
   if (!jsonText) return alert("Please paste JSON data");
+  
   try {
     const data = JSON.parse(jsonText);
     const collection = document.getElementById('collectionSelect').value;
+    
     const res = await fetch(`${API_BASE}/api/admin/questions/${collection}`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(data)
     });
+    
     const result = await res.json();
     if (res.ok) {
       alert(`✅ ${result.count || 1} question(s) uploaded successfully! Batch ID: ${result.batchId}`);
@@ -155,7 +194,7 @@ async function loadQuestions() {
     const questions = await res.json();
     const container = document.getElementById('questionsList');
     container.innerHTML = '';
-
+    
     if (questions.length === 0) {
       container.innerHTML = `<p class="text-gray-500 text-center py-12">No questions found.</p>`;
       return;
@@ -177,14 +216,19 @@ async function loadQuestions() {
             <span class="text-sm font-mono bg-gray-100 px-3 py-1 rounded">Batch: ${batchId}</span>
             <span class="ml-3 text-sm text-gray-500">${batchQuestions.length} questions</span>
           </div>
-          <button onclick="deleteBatch('${batchId}')" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg flex items-center gap-2">
-            <i class="fas fa-trash"></i> Delete Entire Batch
-          </button>
+          <div class="flex gap-3">
+            <button onclick="editBatch('${batchId}')" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg flex items-center gap-2">
+              <i class="fas fa-edit"></i> Edit Entire Batch
+            </button>
+            <button onclick="deleteBatch('${batchId}')" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg flex items-center gap-2">
+              <i class="fas fa-trash"></i> Delete Entire Batch
+            </button>
+          </div>
         </div>
         <div class="space-y-4" id="batch-${batchId}"></div>
       `;
       container.appendChild(batchDiv);
-
+      
       const batchContainer = document.getElementById(`batch-${batchId}`);
       batchQuestions.forEach(q => {
         const card = document.createElement('div');
@@ -228,12 +272,12 @@ async function deleteBatch(batchId) {
   }
 }
 
+// ... (rest of your existing functions remain unchanged)
 async function editQuestion(id) {
   currentEditId = id;
   try {
     const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/${id}`, { headers: getHeaders() });
     const q = await res.json();
-
     const formHTML = `
       <div class="grid grid-cols-2 gap-4">
         <div><label class="block text-sm font-medium mb-1">Exam</label><input id="edit_exam" value="${q.exam}" class="w-full p-3 border rounded-lg"></div>
@@ -268,7 +312,6 @@ async function saveEdit() {
     negativeMarks: parseFloat(document.getElementById('edit_neg').value),
     correct_answer: parseInt(document.getElementById('edit_answer').value)
   };
-
   try {
     const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/${currentEditId}`, {
       method: 'PATCH',
