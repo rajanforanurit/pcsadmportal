@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Portal - Question Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; }
+    .question-card { transition: all 0.2s; }
+    .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Login Screen -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+      <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">PCS Admin Portal</h1>
+      <p class="text-center text-gray-500 mb-6">Backend: <span class="font-mono text-sm">https://pcsadmin.vercel.app</span></p>
+      
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Admin ID</label>
+          <input type="text" id="admin_id" value="admin"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <input type="password" id="admin_pass" value="admin123"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"/>
+        </div>
+        <button onclick="login()"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+          Login to Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Admin Dashboard -->
+  <div id="dashboard" class="hidden min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm border-b">
+      <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">Question Manager</h1>
+          <p class="text-sm text-gray-500">Backend: https://pcsadmin.vercel.app</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <select id="collectionSelect" onchange="loadQuestions()"
+                  class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none">
+            <option value="pcsquestions">PCS Questions</option>
+            <option value="bookquestions">Book Questions</option>
+          </select>
+          <button onclick="logout()" 
+                  class="text-red-600 hover:text-red-700 font-medium flex items-center gap-2">
+            <i class="fas fa-sign-out-alt"></i> Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+      <!-- Upload Section -->
+      <div class="bg-white rounded-2xl shadow p-6 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Upload Questions (JSON)</h2>
+        <textarea id="uploadJson" rows="8"
+                  class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm"
+                  placeholder='Paste your JSON array of questions here...'></textarea>
+        <button onclick="uploadQuestions()" 
+                class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium">
+          Upload to Database
+        </button>
+      </div>
+
+      <!-- Questions List -->
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-semibold">All Questions</h2>
+        <button onclick="loadQuestions()" 
+                class="text-blue-600 hover:text-blue-700 flex items-center gap-2">
+          <i class="fas fa-refresh"></i> Refresh
+        </button>
+      </div>
+
+      <div id="questionsList" class="space-y-4"></div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
+      <div class="p-6 border-b">
+        <h3 class="text-xl font-semibold">Edit Question</h3>
+      </div>
+      <div class="p-6" id="editForm"></div>
+      <div class="p-6 border-t flex justify-end gap-3">
+        <button onclick="closeModal()" class="px-5 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+        <button onclick="saveEdit()" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let token = null;
+    let currentEditId = null;
+    let currentCollection = 'pcsquestions';
+
+    // Your Vercel Backend URL
+    const API_BASE = 'https://pcsadmin.vercel.app';
+
+    async function login() {
+      const admin_id = document.getElementById('admin_id').value.trim();
+      const admin_pass = document.getElementById('admin_pass').value.trim();
+
+      if (!admin_id || !admin_pass) {
+        alert("Please enter Admin ID and Password");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_id, admin_pass })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          token = data.token;
+          localStorage.setItem('adminToken', token);
+          document.getElementById('loginScreen').classList.add('hidden');
+          document.getElementById('dashboard').classList.remove('hidden');
+          loadQuestions();
+        } else {
+          alert(data.error || 'Login failed');
+        }
+      } catch (err) {
+        alert('Cannot connect to server. Please check your internet or backend status.');
+      }
+    }
+
+    function logout() {
+      token = null;
+      localStorage.removeItem('adminToken');
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+    }
+
+    function getHeaders() {
+      return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+    }
+
+    async function uploadQuestions() {
+      const jsonText = document.getElementById('uploadJson').value.trim();
+      if (!jsonText) return alert("Please paste JSON data");
+
+      try {
+        let data = JSON.parse(jsonText);
+        const collection = document.getElementById('collectionSelect').value;
+
+        const res = await fetch(`${API_BASE}/api/admin/questions/${collection}`, {
+          method: 'POST',
+          headers: getHeaders(),
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          alert(`✅ Success! ${result.count || 1} question(s) uploaded.`);
+          document.getElementById('uploadJson').value = '';
+          loadQuestions();
+        } else {
+          alert(result.error || 'Upload failed');
+        }
+      } catch (err) {
+        alert('Invalid JSON or upload error');
+      }
+    }
+
+    async function loadQuestions() {
+      currentCollection = document.getElementById('collectionSelect').value;
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}`, {
+          headers: getHeaders()
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch');
+
+        const questions = await res.json();
+        const container = document.getElementById('questionsList');
+        container.innerHTML = '';
+
+        if (questions.length === 0) {
+          container.innerHTML = `<p class="text-gray-500 text-center py-12">No questions found in this collection.</p>`;
+          return;
+        }
+
+        questions.forEach(q => {
+          const card = document.createElement('div');
+          card.className = 'question-card bg-white border rounded-2xl p-6';
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <span class="text-sm font-mono bg-gray-100 px-2 py-1 rounded">Q.${q.question_no}</span>
+                <h3 class="text-lg font-semibold mt-2 line-clamp-2 pr-4">${q.english.question.substring(0, 140)}...</h3>
+                <p class="text-sm text-gray-500 mt-2">${q.exam} • ${q.year}</p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="editQuestion('${q._id}')" 
+                        class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg text-lg">
+                  ✏️
+                </button>
+                <button onclick="deleteQuestion('${q._id}')" 
+                        class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-lg">
+                  🗑️
+                </button>
+              </div>
+            </div>
+            <div class="mt-4">
+              <span class="inline-block bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-medium">
+                Answer: ${q.answer ? q.answer : 'Not Set'}
+              </span>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error(err);
+        alert('Failed to load questions. Please login again.');
+      }
+    }
+
+    async function editQuestion(id) {
+      currentEditId = id;
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/${id}`, {
+          headers: getHeaders()
+        });
+        const q = await res.json();
+
+        const formHTML = `
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Exam</label>
+              <input id="edit_exam" value="${q.exam}" class="w-full p-3 border rounded-lg"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Year</label>
+              <input id="edit_year" type="number" value="${q.year}" class="w-full p-3 border rounded-lg"/>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="block text-sm font-medium mb-1">Question No</label>
+            <input id="edit_qno" type="number" value="${q.question_no}" class="w-full p-3 border rounded-lg"/>
+          </div>
+
+          <div class="mt-6">
+            <h4 class="font-semibold mb-2">English Section</h4>
+            <textarea id="edit_eng_q" rows="3" class="w-full p-3 border rounded-lg">${q.english.question}</textarea>
+            <input id="edit_eng_opt" value="${q.english.options.join('||')}" 
+                   class="mt-2 w-full p-3 border rounded-lg" placeholder="Options separated by ||"/>
+          </div>
+
+          <div class="mt-6">
+            <h4 class="font-semibold mb-2">Hindi Section</h4>
+            <textarea id="edit_hin_q" rows="3" class="w-full p-3 border rounded-lg">${q.hindi.question}</textarea>
+            <input id="edit_hin_opt" value="${q.hindi.options.join('||')}" 
+                   class="mt-2 w-full p-3 border rounded-lg" placeholder="Options separated by ||"/>
+          </div>
+
+          <div class="mt-6 grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm">Marks</label>
+              <input id="edit_marks" type="number" value="${q.marks}" class="w-full p-3 border rounded-lg"/>
+            </div>
+            <div>
+              <label class="block text-sm">Negative Marks</label>
+              <input id="edit_neg" type="number" value="${q.negativeMarks}" step="0.01" class="w-full p-3 border rounded-lg"/>
+            </div>
+            <div>
+              <label class="block text-sm">Answer (1-4)</label>
+              <input id="edit_answer" type="number" value="${q.answer || ''}" class="w-full p-3 border rounded-lg"/>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('editForm').innerHTML = formHTML;
+        document.getElementById('editModal').classList.remove('hidden');
+      } catch (err) {
+        alert('Failed to load question');
+      }
+    }
+
+    async function saveEdit() {
+      const data = {
+        exam: document.getElementById('edit_exam').value,
+        year: parseInt(document.getElementById('edit_year').value),
+        question_no: parseInt(document.getElementById('edit_qno').value),
+        english: {
+          question: document.getElementById('edit_eng_q').value,
+          options: document.getElementById('edit_eng_opt').value.split('||').map(o => o.trim())
+        },
+        hindi: {
+          question: document.getElementById('edit_hin_q').value,
+          options: document.getElementById('edit_hin_opt').value.split('||').map(o => o.trim())
+        },
+        marks: parseFloat(document.getElementById('edit_marks').value),
+        negativeMarks: parseFloat(document.getElementById('edit_neg').value),
+        answer: document.getElementById('edit_answer').value ? parseInt(document.getElementById('edit_answer').value) : null
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/${currentEditId}`, {
+          method: 'PATCH',
+          headers: getHeaders(),
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          alert('✅ Question updated successfully!');
+          closeModal();
+          loadQuestions();
+        } else {
+          alert('Update failed');
+        }
+      } catch (err) {
+        alert('Error saving changes');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.add('hidden');
+    }
+
+    async function deleteQuestion(id) {
+      if (!confirm('Delete this question permanently?')) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/${id}`, {
+          method: 'DELETE',
+          headers: getHeaders()
+        });
+
+        if (res.ok) {
+          alert('Question deleted successfully');
+          loadQuestions();
+        } else {
+          alert('Delete failed');
+        }
+      } catch (err) {
+        alert('Error deleting question');
+      }
+    }
+
+    // Auto-login if token exists
+    window.onload = () => {
+      const savedToken = localStorage.getItem('adminToken');
+      if (savedToken) {
+        token = savedToken;
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadQuestions();
+      }
+    };
+  </script>
+</body>
+</html>
