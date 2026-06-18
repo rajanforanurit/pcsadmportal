@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Portal - Question Manager</title>
+  <title>PCS Admin Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
   <style>
     body { font-family: 'Segoe UI', sans-serif; }
     .question-card { transition: all 0.2s; }
     .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -17,8 +18,8 @@
   <!-- Login Screen -->
   <div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
     <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
-      <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">PCS Admin Portal</h1>
-      <p class="text-center text-gray-500 mb-6">Backend: <span class="font-mono text-sm">https://pcsadmin.vercel.app</span></p>
+      <h1 class="text-3xl font-bold text-center mb-2">PCS Admin Portal</h1>
+      <p class="text-center text-gray-500 mb-8">https://pcsadmin.vercel.app</p>
       
       <div class="space-y-6">
         <div>
@@ -32,22 +33,19 @@
                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"/>
         </div>
         <button onclick="login()"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
-          Login to Dashboard
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-lg transition">
+          Login
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Main Admin Dashboard -->
+  <!-- Dashboard -->
   <div id="dashboard" class="hidden min-h-screen">
     <!-- Navbar -->
     <nav class="bg-white shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-800">Question Manager</h1>
-          <p class="text-sm text-gray-500">Backend: https://pcsadmin.vercel.app</p>
-        </div>
+        <h1 class="text-2xl font-bold text-gray-800">Question Manager</h1>
         <div class="flex items-center gap-4">
           <select id="collectionSelect" onchange="loadQuestions()"
                   class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none">
@@ -65,19 +63,19 @@
     <div class="max-w-7xl mx-auto px-6 py-8">
       <!-- Upload Section -->
       <div class="bg-white rounded-2xl shadow p-6 mb-8">
-        <h2 class="text-xl font-semibold mb-4">Upload Questions (JSON)</h2>
+        <h2 class="text-xl font-semibold mb-4">Upload Questions (JSON Array)</h2>
         <textarea id="uploadJson" rows="8"
                   class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm"
-                  placeholder='Paste your JSON array of questions here...'></textarea>
+                  placeholder='Paste your JSON array here...'></textarea>
         <button onclick="uploadQuestions()" 
                 class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium">
-          Upload to Database
+          Upload Questions
         </button>
       </div>
 
       <!-- Questions List -->
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-semibold">All Questions</h2>
+        <h2 class="text-2xl font-semibold">Questions List</h2>
         <button onclick="loadQuestions()" 
                 class="text-blue-600 hover:text-blue-700 flex items-center gap-2">
           <i class="fas fa-refresh"></i> Refresh
@@ -96,8 +94,10 @@
       </div>
       <div class="p-6" id="editForm"></div>
       <div class="p-6 border-t flex justify-end gap-3">
-        <button onclick="closeModal()" class="px-5 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-        <button onclick="saveEdit()" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+        <button onclick="closeModal()" 
+                class="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+        <button onclick="saveEdit()" 
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
       </div>
     </div>
   </div>
@@ -106,8 +106,6 @@
     let token = null;
     let currentEditId = null;
     let currentCollection = 'pcsquestions';
-
-    // Your Vercel Backend URL
     const API_BASE = 'https://pcsadmin.vercel.app';
 
     async function login() {
@@ -127,7 +125,6 @@
         });
 
         const data = await res.json();
-
         if (res.ok) {
           token = data.token;
           localStorage.setItem('adminToken', token);
@@ -138,7 +135,7 @@
           alert(data.error || 'Login failed');
         }
       } catch (err) {
-        alert('Cannot connect to server. Please check your internet or backend status.');
+        alert('Cannot connect to server. Please check backend is running.');
       }
     }
 
@@ -161,7 +158,7 @@
       if (!jsonText) return alert("Please paste JSON data");
 
       try {
-        let data = JSON.parse(jsonText);
+        const data = JSON.parse(jsonText);
         const collection = document.getElementById('collectionSelect').value;
 
         const res = await fetch(`${API_BASE}/api/admin/questions/${collection}`, {
@@ -172,33 +169,30 @@
 
         const result = await res.json();
         if (res.ok) {
-          alert(`✅ Success! ${result.count || 1} question(s) uploaded.`);
+          alert(`✅ ${result.count || 1} question(s) uploaded successfully!`);
           document.getElementById('uploadJson').value = '';
           loadQuestions();
         } else {
           alert(result.error || 'Upload failed');
         }
       } catch (err) {
-        alert('Invalid JSON or upload error');
+        alert('Invalid JSON format or upload error');
       }
     }
 
     async function loadQuestions() {
       currentCollection = document.getElementById('collectionSelect').value;
-      
       try {
         const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}`, {
           headers: getHeaders()
         });
-
-        if (!res.ok) throw new Error('Failed to fetch');
 
         const questions = await res.json();
         const container = document.getElementById('questionsList');
         container.innerHTML = '';
 
         if (questions.length === 0) {
-          container.innerHTML = `<p class="text-gray-500 text-center py-12">No questions found in this collection.</p>`;
+          container.innerHTML = `<p class="text-gray-500 text-center py-12">No questions found.</p>`;
           return;
         }
 
@@ -209,23 +203,17 @@
             <div class="flex justify-between items-start">
               <div class="flex-1">
                 <span class="text-sm font-mono bg-gray-100 px-2 py-1 rounded">Q.${q.question_no}</span>
-                <h3 class="text-lg font-semibold mt-2 line-clamp-2 pr-4">${q.english.question.substring(0, 140)}...</h3>
+                <h3 class="text-lg font-semibold mt-2 line-clamp-2">${q.english.question.substring(0, 140)}...</h3>
                 <p class="text-sm text-gray-500 mt-2">${q.exam} • ${q.year}</p>
               </div>
               <div class="flex gap-2">
-                <button onclick="editQuestion('${q._id}')" 
-                        class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg text-lg">
-                  ✏️
-                </button>
-                <button onclick="deleteQuestion('${q._id}')" 
-                        class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg text-lg">
-                  🗑️
-                </button>
+                <button onclick="editQuestion('${q._id}')" class="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg">✏️</button>
+                <button onclick="deleteQuestion('${q._id}')" class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg">🗑️</button>
               </div>
             </div>
             <div class="mt-4">
               <span class="inline-block bg-green-100 text-green-700 px-4 py-1 rounded-full text-sm font-medium">
-                Answer: ${q.answer ? q.answer : 'Not Set'}
+                Answer: ${q.answer !== null ? q.answer : 'Not Set'}
               </span>
             </div>
           `;
@@ -263,14 +251,14 @@
           </div>
 
           <div class="mt-6">
-            <h4 class="font-semibold mb-2">English Section</h4>
+            <h4 class="font-semibold mb-2">English</h4>
             <textarea id="edit_eng_q" rows="3" class="w-full p-3 border rounded-lg">${q.english.question}</textarea>
             <input id="edit_eng_opt" value="${q.english.options.join('||')}" 
                    class="mt-2 w-full p-3 border rounded-lg" placeholder="Options separated by ||"/>
           </div>
 
           <div class="mt-6">
-            <h4 class="font-semibold mb-2">Hindi Section</h4>
+            <h4 class="font-semibold mb-2">Hindi</h4>
             <textarea id="edit_hin_q" rows="3" class="w-full p-3 border rounded-lg">${q.hindi.question}</textarea>
             <input id="edit_hin_opt" value="${q.hindi.options.join('||')}" 
                    class="mt-2 w-full p-3 border rounded-lg" placeholder="Options separated by ||"/>
@@ -295,7 +283,7 @@
         document.getElementById('editForm').innerHTML = formHTML;
         document.getElementById('editModal').classList.remove('hidden');
       } catch (err) {
-        alert('Failed to load question');
+        alert('Failed to load question for editing');
       }
     }
 
@@ -341,7 +329,7 @@
     }
 
     async function deleteQuestion(id) {
-      if (!confirm('Delete this question permanently?')) return;
+      if (!confirm('Are you sure you want to delete this question?')) return;
 
       try {
         const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/${id}`, {
@@ -360,7 +348,7 @@
       }
     }
 
-    // Auto-login if token exists
+    // Auto login if token exists
     window.onload = () => {
       const savedToken = localStorage.getItem('adminToken');
       if (savedToken) {
