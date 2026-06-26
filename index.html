@@ -12,7 +12,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
 .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
-/* ===== Tab switcher ===== */
 .tab-bar { background: #ffffff; border-bottom: 1px solid #e5e7eb; }
 .tab-btn {
   position: relative;
@@ -42,13 +41,11 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
 .section-panel { display: none; }
 .section-panel.active { display: block; }
 
-/* ===== Stat pill ===== */
 .stat-pill {
   background: linear-gradient(135deg,#eef2ff,#f5f3ff);
   border: 1px solid #e0e7ff;
 }
 
-/* ===== Repeatable list-item rows (line-by-line entry) ===== */
 .dyn-row { display:flex; gap:0.5rem; align-items:flex-start; }
 .dyn-row textarea, .dyn-row input { flex:1; }
 .remove-row-btn {
@@ -66,7 +63,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
 }
 .add-row-btn:hover { background:#eef2ff; }
 
-/* ===== Form labels ===== */
 .field-label { display:block; font-size:0.78rem; font-weight:600; color:#4b5563; margin-bottom:0.3rem; letter-spacing:0.01em; }
 .input-base {
   width:100%; padding:0.7rem 0.9rem; border:1px solid #d1d5db; border-radius:0.6rem;
@@ -74,12 +70,10 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
 }
 .input-base:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.12); }
 
-/* ===== Section header badges ===== */
 .section-badge {
   width:2.75rem; height:2.75rem; border-radius:0.9rem; display:flex; align-items:center; justify-content:center; font-size:1.1rem;
 }
 
-/* Scrollbar polish for modals */
 .modal-scroll::-webkit-scrollbar { width: 8px; }
 .modal-scroll::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:4px; }
 
@@ -132,7 +126,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
     </div>
   </nav>
 
-  <!-- ===== Tab Switcher Bar ===== -->
   <div class="tab-bar sticky top-0 z-30 shadow-sm">
     <div class="max-w-7xl mx-auto px-6 flex gap-1 overflow-x-auto">
       <button class="tab-btn active" id="tabBtn-pcs" onclick="switchTab('pcs')">
@@ -152,9 +145,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
 
   <div class="max-w-7xl mx-auto px-6 py-8">
 
-    <!-- ============================================================= -->
-    <!-- SECTION 1: PCS QUESTIONS                                       -->
-    <!-- ============================================================= -->
     <div id="panel-pcs" class="section-panel active">
       <div class="flex items-center gap-3 mb-6">
         <div class="section-badge bg-indigo-100 text-indigo-600"><i class="fas fa-list-check"></i></div>
@@ -164,7 +154,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         </div>
       </div>
 
-      <!-- Upload Section -->
       <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
         <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
           <h3 class="text-lg font-semibold">Upload / Edit Questions (JSON Array)</h3>
@@ -189,9 +178,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
       <div id="questionsList" class="space-y-4"></div>
     </div>
 
-    <!-- ============================================================= -->
-    <!-- SECTION 2: CURRENT AFFAIRS                                     -->
-    <!-- ============================================================= -->
     <div id="panel-ca" class="section-panel">
       <div class="flex items-center gap-3 mb-6">
         <div class="section-badge bg-amber-100 text-amber-600"><i class="fas fa-newspaper"></i></div>
@@ -201,7 +187,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         </div>
       </div>
 
-      <!-- Add Entry Form (line-by-line) -->
       <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
         <h3 class="text-lg font-semibold mb-4"><i class="fas fa-plus-circle text-amber-500 mr-2"></i>Add New Current Affair</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -238,7 +223,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         </button>
       </div>
 
-      <!-- Filters + Bulk Delete -->
       <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
         <div class="flex flex-wrap gap-3 items-end">
           <div class="flex-1 min-w-[180px]">
@@ -273,9 +257,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
       <div id="caList" class="space-y-4"></div>
     </div>
 
-    <!-- ============================================================= -->
-    <!-- SECTION 3: IMPORTANT TOPICS                                    -->
-    <!-- ============================================================= -->
     <div id="panel-it" class="section-panel">
       <div class="flex items-center gap-3 mb-6">
         <div class="section-badge bg-emerald-100 text-emerald-600"><i class="fas fa-lightbulb"></i></div>
@@ -285,32 +266,20 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         </div>
       </div>
 
-      <!-- Add Entry Form (line-by-line) -->
       <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
-        <h3 class="text-lg font-semibold mb-4"><i class="fas fa-plus-circle text-emerald-500 mr-2"></i>Add New Important Topic</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="field-label">Title</label>
-            <input type="text" id="it_title" class="input-base" placeholder="e.g. Fundamental Rights">
-          </div>
-          <div>
-            <label class="field-label">Subject</label>
-            <input type="text" id="it_subject" class="input-base" placeholder="e.g. Polity">
-          </div>
-        </div>
-        <div class="mt-4">
-          <label class="field-label">Points</label>
-          <div id="it_points_rows" class="space-y-2"></div>
-          <button type="button" class="add-row-btn mt-2" onclick="addDynRow('it_points_rows','text','Add a point...')">
-            <i class="fas fa-plus"></i> Add Point
-          </button>
-        </div>
-        <button onclick="submitImportantTopic()" class="mt-6 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-emerald-100">
-          <i class="fas fa-paper-plane mr-2"></i>Submit Important Topic
+        <h3 class="text-lg font-semibold mb-4"><i class="fas fa-code text-emerald-500 mr-2"></i>Upload Important Topics (JSON Array)</h3>
+        <textarea id="it_upload_json" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-100 focus:border-emerald-400" placeholder='[
+  {
+    "title": "Fundamental Rights",
+    "subject": "Polity",
+    "points": ["Article 14 - Equality before law", "Article 19 - Freedom of speech"]
+  }
+]'></textarea>
+        <button onclick="uploadImportantTopics()" class="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-emerald-100">
+          <i class="fas fa-upload mr-2"></i>Upload Important Topics
         </button>
       </div>
 
-      <!-- Filters + Bulk Delete -->
       <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
         <div class="flex flex-wrap gap-3 items-end">
           <div class="flex-1 min-w-[180px]">
@@ -342,9 +311,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
   </div>
 </div>
 
-<!-- ============================================================= -->
-<!-- Edit Single Question Modal (PCS)                               -->
-<!-- ============================================================= -->
 <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
   <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
     <div class="p-6 border-b flex items-center gap-3">
@@ -359,9 +325,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
   </div>
 </div>
 
-<!-- ============================================================= -->
-<!-- Edit Current Affair Modal                                      -->
-<!-- ============================================================= -->
 <div id="caEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
   <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
     <div class="p-6 border-b flex items-center gap-3">
@@ -376,9 +339,6 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
   </div>
 </div>
 
-<!-- ============================================================= -->
-<!-- Edit Important Topic Modal                                     -->
-<!-- ============================================================= -->
 <div id="itEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
   <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
     <div class="p-6 border-b flex items-center gap-3">
@@ -399,9 +359,6 @@ let currentEditId = null;
 let currentCollection = 'pcsquestions';
 const API_BASE = 'https://pcsadmin.vercel.app';
 
-/* ===================================================================== */
-/* AUTH (unchanged logic)                                                */
-/* ===================================================================== */
 async function login() {
   const admin_id = document.getElementById('admin_id').value.trim();
   const admin_pass = document.getElementById('admin_pass').value.trim();
@@ -442,9 +399,6 @@ function getHeaders() {
   };
 }
 
-/* ===================================================================== */
-/* TAB SWITCHER                                                           */
-/* ===================================================================== */
 function switchTab(tab) {
   ['pcs','ca','it'].forEach(t => {
     document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
@@ -460,9 +414,7 @@ function initDashboard() {
   loadQuestions();
   loadCurrentAffairs();
   loadImportantTopics();
-  // seed one empty row in each dynamic list for convenience
   addDynRow('ca_highlights_rows', 'text', 'Add a highlight point...');
-  addDynRow('it_points_rows', 'text', 'Add a point...');
 }
 
 async function checkHealth() {
@@ -475,9 +427,6 @@ async function checkHealth() {
   }
 }
 
-/* ===================================================================== */
-/* DYNAMIC ROW HELPERS (line-by-line list entry for highlights/points)   */
-/* ===================================================================== */
 let dynRowCounter = 0;
 function addDynRow(containerId, type, placeholder, value = '') {
   const container = document.getElementById(containerId);
@@ -513,7 +462,6 @@ function clearDynRows(containerId) {
   document.getElementById(containerId).innerHTML = '';
 }
 
-/* simple debounce helper for live search inputs */
 function debounce(fn, delay = 400) {
   let timer = null;
   return (...args) => {
@@ -524,9 +472,6 @@ function debounce(fn, delay = 400) {
 const debouncedLoadCA = debounce(() => loadCurrentAffairs(), 400);
 const debouncedLoadIT = debounce(() => loadImportantTopics(), 400);
 
-/* ===================================================================== */
-/* SECTION 1: PCS QUESTIONS (existing logic, unchanged)                  */
-/* ===================================================================== */
 async function editBatch(batchId) {
   if (!confirm(`Edit entire batch ${batchId}?`)) return;
   
@@ -743,9 +688,6 @@ async function deleteQuestion(id) {
   }
 }
 
-/* ===================================================================== */
-/* SECTION 2: CURRENT AFFAIRS                                            */
-/* ===================================================================== */
 async function submitCurrentAffair() {
   const title = document.getElementById('ca_title').value.trim();
   const date = document.getElementById('ca_date').value.trim();
@@ -954,41 +896,28 @@ async function bulkDeleteCA(mode) {
   }
 }
 
-/* ===================================================================== */
-/* SECTION 3: IMPORTANT TOPICS                                           */
-/* ===================================================================== */
-async function submitImportantTopic() {
-  const title = document.getElementById('it_title').value.trim();
-  const subject = document.getElementById('it_subject').value.trim();
-  const points = getDynRowValues('it_points_rows');
-
-  if (!title || !subject) {
-    return alert('Please fill in Title and Subject');
-  }
-  if (points.length === 0) {
-    return alert('Please add at least one point');
-  }
+async function uploadImportantTopics() {
+  const jsonText = document.getElementById('it_upload_json').value.trim();
+  if (!jsonText) return alert('Please paste JSON data');
 
   try {
+    const data = JSON.parse(jsonText);
+
     const res = await fetch(`${API_BASE}/api/admin/important-topics`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({ title, subject, points })
+      body: JSON.stringify(data)
     });
     const result = await res.json();
     if (res.ok) {
-      alert('✅ Important topic added successfully!');
-      document.getElementById('it_title').value = '';
-      document.getElementById('it_subject').value = '';
-      clearDynRows('it_points_rows');
-      addDynRow('it_points_rows', 'text', 'Add a point...');
+      alert(`✅ ${result.count || 1} important topic(s) uploaded successfully!`);
+      document.getElementById('it_upload_json').value = '';
       loadImportantTopics();
     } else {
-      alert(result.error || 'Failed to add important topic');
+      alert(result.error || 'Upload failed');
     }
   } catch (err) {
-    alert('Error submitting important topic');
-    console.error(err);
+    alert('Invalid JSON format');
   }
 }
 
@@ -1140,9 +1069,6 @@ async function bulkDeleteIT() {
   }
 }
 
-/* ===================================================================== */
-/* UTILITIES                                                             */
-/* ===================================================================== */
 function escapeHtml(str) {
   if (str === null || str === undefined) return '';
   return String(str)
