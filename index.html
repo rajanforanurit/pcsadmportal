@@ -7,26 +7,107 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 <style>
-body { font-family: 'Segoe UI', sans-serif; }
+body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
 .question-card { transition: all 0.2s; }
 .question-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
 .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ===== Tab switcher ===== */
+.tab-bar { background: #ffffff; border-bottom: 1px solid #e5e7eb; }
+.tab-btn {
+  position: relative;
+  padding: 0.9rem 1.4rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: #4338ca; background: #f8f8ff; }
+.tab-btn.active { color: #4338ca; border-bottom-color: #4f46e5; background: #f5f5ff; }
+.tab-btn .tab-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #e5e7eb;
+  color: #4b5563;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+.tab-btn.active .tab-count { background: #4f46e5; color: white; }
+
+.section-panel { display: none; }
+.section-panel.active { display: block; }
+
+/* ===== Stat pill ===== */
+.stat-pill {
+  background: linear-gradient(135deg,#eef2ff,#f5f3ff);
+  border: 1px solid #e0e7ff;
+}
+
+/* ===== Repeatable list-item rows (line-by-line entry) ===== */
+.dyn-row { display:flex; gap:0.5rem; align-items:flex-start; }
+.dyn-row textarea, .dyn-row input { flex:1; }
+.remove-row-btn {
+  flex-shrink:0; width:2.5rem; height:2.5rem; border-radius:0.5rem;
+  display:flex; align-items:center; justify-content:center;
+  color:#dc2626; background:#fef2f2; border:1px solid #fee2e2;
+  transition: background 0.15s;
+}
+.remove-row-btn:hover { background:#fee2e2; }
+.add-row-btn {
+  display:inline-flex; align-items:center; gap:0.4rem;
+  font-size:0.85rem; font-weight:600; color:#4f46e5;
+  padding:0.5rem 0.9rem; border-radius:0.5rem; border:1px dashed #c7d2fe;
+  background:#f5f5ff; transition: background 0.15s;
+}
+.add-row-btn:hover { background:#eef2ff; }
+
+/* ===== Form labels ===== */
+.field-label { display:block; font-size:0.78rem; font-weight:600; color:#4b5563; margin-bottom:0.3rem; letter-spacing:0.01em; }
+.input-base {
+  width:100%; padding:0.7rem 0.9rem; border:1px solid #d1d5db; border-radius:0.6rem;
+  font-size:0.9rem; transition: border-color 0.15s, box-shadow 0.15s; background:#fff;
+}
+.input-base:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.12); }
+
+/* ===== Section header badges ===== */
+.section-badge {
+  width:2.75rem; height:2.75rem; border-radius:0.9rem; display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+}
+
+/* Scrollbar polish for modals */
+.modal-scroll::-webkit-scrollbar { width: 8px; }
+.modal-scroll::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:4px; }
+
+.empty-state {
+  border:2px dashed #e5e7eb; border-radius:1rem; padding:3rem 1.5rem; text-align:center; color:#9ca3af; background:#fafafa;
+}
 </style>
 </head>
 <body class="bg-gray-50">
-<div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+<div id="loginScreen" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-700 via-blue-700 to-indigo-900">
   <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
-    <h1 class="text-3xl font-bold text-center mb-2">PCS Admin Portal</h1>
+    <div class="flex items-center justify-center mb-4">
+      <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+    </div>
+    <h1 class="text-3xl font-bold text-center mb-1">PCS Admin Portal</h1>
+    <p class="text-center text-gray-400 text-sm mb-6">Sign in to manage content</p>
     <div class="space-y-6">
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Admin ID</label>
-        <input type="text" id="admin_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+        <input type="text" id="admin_id" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-        <input type="password" id="admin_pass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+        <input type="password" id="admin_pass" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
       </div>
-      <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-lg transition">Login</button>
+      <button onclick="login()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3.5 rounded-lg transition shadow-lg shadow-indigo-200">Login</button>
     </div>
   </div>
 </div>
@@ -34,50 +115,280 @@ body { font-family: 'Segoe UI', sans-serif; }
 <div id="dashboard" class="hidden min-h-screen">
   <nav class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-800">Question Manager</h1>
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <h1 class="text-xl font-bold text-gray-800">PCS Admin Portal</h1>
+      </div>
       <div class="flex items-center gap-4">
-        <select id="collectionSelect" onchange="loadQuestions()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none">
-          <option value="pcsquestions">PCS Questions</option>
-          <option value="bookquestions">Book Questions</option>
-        </select>
-        <button onclick="logout()" class="text-red-600 hover:text-red-700 font-medium flex items-center gap-2">
+        <span id="healthDot" class="hidden sm:flex items-center gap-2 text-xs font-medium text-gray-500">
+          <span class="w-2 h-2 rounded-full bg-gray-300" id="healthIndicator"></span> API
+        </span>
+        <button onclick="logout()" class="text-red-600 hover:text-red-700 font-medium flex items-center gap-2 text-sm">
           <i class="fas fa-sign-out-alt"></i> Logout
         </button>
       </div>
     </div>
   </nav>
 
+  <!-- ===== Tab Switcher Bar ===== -->
+  <div class="tab-bar sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 flex gap-1 overflow-x-auto">
+      <button class="tab-btn active" id="tabBtn-pcs" onclick="switchTab('pcs')">
+        <i class="fas fa-list-check"></i> PCS Questions
+        <span class="tab-count" id="count-pcs">0</span>
+      </button>
+      <button class="tab-btn" id="tabBtn-ca" onclick="switchTab('ca')">
+        <i class="fas fa-newspaper"></i> Current Affairs
+        <span class="tab-count" id="count-ca">0</span>
+      </button>
+      <button class="tab-btn" id="tabBtn-it" onclick="switchTab('it')">
+        <i class="fas fa-lightbulb"></i> Important Topics
+        <span class="tab-count" id="count-it">0</span>
+      </button>
+    </div>
+  </div>
+
   <div class="max-w-7xl mx-auto px-6 py-8">
-    <!-- Upload Section -->
-    <div class="bg-white rounded-2xl shadow p-6 mb-8">
-      <h2 class="text-xl font-semibold mb-4">Upload / Edit Questions (JSON Array)</h2>
-      <textarea id="uploadJson" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm" placeholder='Paste your JSON array here...'></textarea>
-      <button onclick="uploadQuestions()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium">
-        Upload / Re-upload Questions
-      </button>
+
+    <!-- ============================================================= -->
+    <!-- SECTION 1: PCS QUESTIONS                                       -->
+    <!-- ============================================================= -->
+    <div id="panel-pcs" class="section-panel active">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="section-badge bg-indigo-100 text-indigo-600"><i class="fas fa-list-check"></i></div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Question Manager</h2>
+          <p class="text-sm text-gray-500">Bulk upload, review, and edit exam questions</p>
+        </div>
+      </div>
+
+      <!-- Upload Section -->
+      <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+          <h3 class="text-lg font-semibold">Upload / Edit Questions (JSON Array)</h3>
+          <select id="collectionSelect" onchange="loadQuestions()" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none text-sm font-medium">
+            <option value="pcsquestions">PCS Questions</option>
+            <option value="bookquestions">Book Questions</option>
+          </select>
+        </div>
+        <textarea id="uploadJson" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400" placeholder='Paste your JSON array here...'></textarea>
+        <button onclick="uploadQuestions()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-green-100">
+          <i class="fas fa-upload mr-2"></i>Upload / Re-upload Questions
+        </button>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Questions List</h2>
+        <button onclick="loadQuestions()" class="text-indigo-600 hover:text-indigo-700 flex items-center gap-2 text-sm font-medium">
+          <i class="fas fa-rotate"></i> Refresh
+        </button>
+      </div>
+
+      <div id="questionsList" class="space-y-4"></div>
     </div>
 
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-semibold">Questions List</h2>
-      <button onclick="loadQuestions()" class="text-blue-600 hover:text-blue-700 flex items-center gap-2">
-        <i class="fas fa-refresh"></i> Refresh
-      </button>
+    <!-- ============================================================= -->
+    <!-- SECTION 2: CURRENT AFFAIRS                                     -->
+    <!-- ============================================================= -->
+    <div id="panel-ca" class="section-panel">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="section-badge bg-amber-100 text-amber-600"><i class="fas fa-newspaper"></i></div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Current Affairs Manager</h2>
+          <p class="text-sm text-gray-500">Add and manage daily current affairs entries</p>
+        </div>
+      </div>
+
+      <!-- Add Entry Form (line-by-line) -->
+      <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4"><i class="fas fa-plus-circle text-amber-500 mr-2"></i>Add New Current Affair</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="field-label">Title</label>
+            <input type="text" id="ca_title" class="input-base" placeholder="e.g. RBI revises repo rate">
+          </div>
+          <div>
+            <label class="field-label">Date</label>
+            <input type="date" id="ca_date" class="input-base">
+          </div>
+          <div>
+            <label class="field-label">Subject</label>
+            <input type="text" id="ca_subject" class="input-base" placeholder="e.g. Economy">
+          </div>
+          <div>
+            <label class="field-label">Image URL <span class="text-gray-400 font-normal">(optional)</span></label>
+            <input type="text" id="ca_imgUrl" class="input-base" placeholder="https://...">
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="field-label">Overview</label>
+          <textarea id="ca_overview" rows="3" class="input-base" placeholder="Short overview / summary of this current affair..."></textarea>
+        </div>
+        <div class="mt-4">
+          <label class="field-label">Highlights</label>
+          <div id="ca_highlights_rows" class="space-y-2"></div>
+          <button type="button" class="add-row-btn mt-2" onclick="addDynRow('ca_highlights_rows','text','Add a highlight point...')">
+            <i class="fas fa-plus"></i> Add Highlight
+          </button>
+        </div>
+        <button onclick="submitCurrentAffair()" class="mt-6 bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-amber-100">
+          <i class="fas fa-paper-plane mr-2"></i>Submit Current Affair
+        </button>
+      </div>
+
+      <!-- Filters + Bulk Delete -->
+      <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
+        <div class="flex flex-wrap gap-3 items-end">
+          <div class="flex-1 min-w-[180px]">
+            <label class="field-label">Search by title</label>
+            <input type="text" id="ca_search" class="input-base" placeholder="Search title..." oninput="debouncedLoadCA()">
+          </div>
+          <div class="min-w-[160px]">
+            <label class="field-label">Filter by subject</label>
+            <input type="text" id="ca_filter_subject" class="input-base" placeholder="Subject" oninput="debouncedLoadCA()">
+          </div>
+          <div class="min-w-[160px]">
+            <label class="field-label">Filter by date</label>
+            <input type="date" id="ca_filter_date" class="input-base" onchange="loadCurrentAffairs()">
+          </div>
+          <button onclick="loadCurrentAffairs()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700">
+            <i class="fas fa-rotate mr-1"></i> Refresh
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-3 items-end mt-4 pt-4 border-t border-gray-100">
+          <span class="text-sm font-semibold text-gray-500 mr-1">Bulk delete:</span>
+          <input type="text" id="ca_bulk_subject" class="input-base max-w-[200px]" placeholder="By subject...">
+          <button onclick="bulkDeleteCA('subject')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Subject</button>
+          <input type="date" id="ca_bulk_date" class="input-base max-w-[200px]">
+          <button onclick="bulkDeleteCA('date')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Date</button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Current Affairs List</h2>
+        <span class="stat-pill text-xs font-semibold text-indigo-700 px-3 py-1.5 rounded-full" id="ca_total_label">0 total</span>
+      </div>
+      <div id="caList" class="space-y-4"></div>
     </div>
 
-    <div id="questionsList" class="space-y-4"></div>
+    <!-- ============================================================= -->
+    <!-- SECTION 3: IMPORTANT TOPICS                                    -->
+    <!-- ============================================================= -->
+    <div id="panel-it" class="section-panel">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="section-badge bg-emerald-100 text-emerald-600"><i class="fas fa-lightbulb"></i></div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Important Topics Manager</h2>
+          <p class="text-sm text-gray-500">Add and manage key revision topics</p>
+        </div>
+      </div>
+
+      <!-- Add Entry Form (line-by-line) -->
+      <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4"><i class="fas fa-plus-circle text-emerald-500 mr-2"></i>Add New Important Topic</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="field-label">Title</label>
+            <input type="text" id="it_title" class="input-base" placeholder="e.g. Fundamental Rights">
+          </div>
+          <div>
+            <label class="field-label">Subject</label>
+            <input type="text" id="it_subject" class="input-base" placeholder="e.g. Polity">
+          </div>
+        </div>
+        <div class="mt-4">
+          <label class="field-label">Points</label>
+          <div id="it_points_rows" class="space-y-2"></div>
+          <button type="button" class="add-row-btn mt-2" onclick="addDynRow('it_points_rows','text','Add a point...')">
+            <i class="fas fa-plus"></i> Add Point
+          </button>
+        </div>
+        <button onclick="submitImportantTopic()" class="mt-6 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-emerald-100">
+          <i class="fas fa-paper-plane mr-2"></i>Submit Important Topic
+        </button>
+      </div>
+
+      <!-- Filters + Bulk Delete -->
+      <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
+        <div class="flex flex-wrap gap-3 items-end">
+          <div class="flex-1 min-w-[180px]">
+            <label class="field-label">Search by title</label>
+            <input type="text" id="it_search" class="input-base" placeholder="Search title..." oninput="debouncedLoadIT()">
+          </div>
+          <div class="min-w-[160px]">
+            <label class="field-label">Filter by subject</label>
+            <input type="text" id="it_filter_subject" class="input-base" placeholder="Subject" oninput="debouncedLoadIT()">
+          </div>
+          <button onclick="loadImportantTopics()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700">
+            <i class="fas fa-rotate mr-1"></i> Refresh
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-3 items-end mt-4 pt-4 border-t border-gray-100">
+          <span class="text-sm font-semibold text-gray-500 mr-1">Bulk delete:</span>
+          <input type="text" id="it_bulk_subject" class="input-base max-w-[200px]" placeholder="By subject...">
+          <button onclick="bulkDeleteIT()" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Subject</button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Important Topics List</h2>
+        <span class="stat-pill text-xs font-semibold text-indigo-700 px-3 py-1.5 rounded-full" id="it_total_label">0 total</span>
+      </div>
+      <div id="itList" class="space-y-4"></div>
+    </div>
+
   </div>
 </div>
 
-<!-- Edit Single Question Modal -->
-<div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-  <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto">
-    <div class="p-6 border-b">
+<!-- ============================================================= -->
+<!-- Edit Single Question Modal (PCS)                               -->
+<!-- ============================================================= -->
+<div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
+    <div class="p-6 border-b flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center"><i class="fas fa-pen"></i></div>
       <h3 class="text-xl font-semibold">Edit Question</h3>
     </div>
     <div class="p-6" id="editForm"></div>
     <div class="p-6 border-t flex justify-end gap-3">
       <button onclick="closeModal()" class="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-      <button onclick="saveEdit()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+      <button onclick="saveEdit()" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- Edit Current Affair Modal                                      -->
+<!-- ============================================================= -->
+<div id="caEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
+    <div class="p-6 border-b flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center"><i class="fas fa-pen"></i></div>
+      <h3 class="text-xl font-semibold">Edit Current Affair</h3>
+    </div>
+    <div class="p-6" id="caEditForm"></div>
+    <div class="p-6 border-t flex justify-end gap-3">
+      <button onclick="closeCAModal()" class="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+      <button onclick="saveCAEdit()" class="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================= -->
+<!-- Edit Important Topic Modal                                     -->
+<!-- ============================================================= -->
+<div id="itEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
+    <div class="p-6 border-b flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center"><i class="fas fa-pen"></i></div>
+      <h3 class="text-xl font-semibold">Edit Important Topic</h3>
+    </div>
+    <div class="p-6" id="itEditForm"></div>
+    <div class="p-6 border-t flex justify-end gap-3">
+      <button onclick="closeITModal()" class="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+      <button onclick="saveITEdit()" class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">Save Changes</button>
     </div>
   </div>
 </div>
@@ -88,6 +399,9 @@ let currentEditId = null;
 let currentCollection = 'pcsquestions';
 const API_BASE = 'https://pcsadmin.vercel.app';
 
+/* ===================================================================== */
+/* AUTH (unchanged logic)                                                */
+/* ===================================================================== */
 async function login() {
   const admin_id = document.getElementById('admin_id').value.trim();
   const admin_pass = document.getElementById('admin_pass').value.trim();
@@ -105,7 +419,7 @@ async function login() {
       localStorage.setItem('adminToken', token);
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
-      loadQuestions();
+      initDashboard();
     } else {
       alert(data.error || 'Login failed');
     }
@@ -128,7 +442,91 @@ function getHeaders() {
   };
 }
 
-// ====================== NEW: Edit Entire Batch ======================
+/* ===================================================================== */
+/* TAB SWITCHER                                                           */
+/* ===================================================================== */
+function switchTab(tab) {
+  ['pcs','ca','it'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
+    document.getElementById(`tabBtn-${t}`).classList.toggle('active', t === tab);
+  });
+  if (tab === 'pcs') loadQuestions();
+  if (tab === 'ca') loadCurrentAffairs();
+  if (tab === 'it') loadImportantTopics();
+}
+
+function initDashboard() {
+  checkHealth();
+  loadQuestions();
+  loadCurrentAffairs();
+  loadImportantTopics();
+  // seed one empty row in each dynamic list for convenience
+  addDynRow('ca_highlights_rows', 'text', 'Add a highlight point...');
+  addDynRow('it_points_rows', 'text', 'Add a point...');
+}
+
+async function checkHealth() {
+  const dot = document.getElementById('healthIndicator');
+  try {
+    const res = await fetch(`${API_BASE}/api/health`);
+    dot.className = res.ok ? 'w-2 h-2 rounded-full bg-green-500' : 'w-2 h-2 rounded-full bg-red-500';
+  } catch (err) {
+    dot.className = 'w-2 h-2 rounded-full bg-red-500';
+  }
+}
+
+/* ===================================================================== */
+/* DYNAMIC ROW HELPERS (line-by-line list entry for highlights/points)   */
+/* ===================================================================== */
+let dynRowCounter = 0;
+function addDynRow(containerId, type, placeholder, value = '') {
+  const container = document.getElementById(containerId);
+  const rowId = `row_${containerId}_${dynRowCounter++}`;
+  const row = document.createElement('div');
+  row.className = 'dyn-row';
+  row.id = rowId;
+  row.innerHTML = `
+    <textarea rows="1" class="input-base" placeholder="${placeholder}" oninput="autoGrow(this)">${value}</textarea>
+    <button type="button" class="remove-row-btn" onclick="document.getElementById('${rowId}').remove()" title="Remove">
+      <i class="fas fa-trash"></i>
+    </button>
+  `;
+  container.appendChild(row);
+}
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight) + 'px';
+}
+
+function getDynRowValues(containerId) {
+  const container = document.getElementById(containerId);
+  const values = [];
+  container.querySelectorAll('textarea').forEach(t => {
+    const v = t.value.trim();
+    if (v) values.push(v);
+  });
+  return values;
+}
+
+function clearDynRows(containerId) {
+  document.getElementById(containerId).innerHTML = '';
+}
+
+/* simple debounce helper for live search inputs */
+function debounce(fn, delay = 400) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+const debouncedLoadCA = debounce(() => loadCurrentAffairs(), 400);
+const debouncedLoadIT = debounce(() => loadImportantTopics(), 400);
+
+/* ===================================================================== */
+/* SECTION 1: PCS QUESTIONS (existing logic, unchanged)                  */
+/* ===================================================================== */
 async function editBatch(batchId) {
   if (!confirm(`Edit entire batch ${batchId}?`)) return;
   
@@ -144,12 +542,10 @@ async function editBatch(batchId) {
     
     const data = await res.json();
     
-    // Populate the upload textarea with clean JSON
     document.getElementById('uploadJson').value = JSON.stringify(data.questions, null, 2);
     
     alert(`✅ Batch ${batchId} loaded for editing!\n\nYou can now edit the JSON and click "Upload / Re-upload Questions"`);
     
-    // Scroll to upload section
     document.getElementById('uploadJson').scrollIntoView({ behavior: 'smooth' });
     
   } catch (err) {
@@ -157,8 +553,6 @@ async function editBatch(batchId) {
     console.error(err);
   }
 }
-
-// ====================== Existing Functions ======================
 
 async function uploadQuestions() {
   const jsonText = document.getElementById('uploadJson').value.trim();
@@ -194,9 +588,11 @@ async function loadQuestions() {
     const questions = await res.json();
     const container = document.getElementById('questionsList');
     container.innerHTML = '';
+
+    document.getElementById('count-pcs').textContent = Array.isArray(questions) ? questions.length : 0;
     
-    if (questions.length === 0) {
-      container.innerHTML = `<p class="text-gray-500 text-center py-12">No questions found.</p>`;
+    if (!Array.isArray(questions) || questions.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox text-3xl mb-3"></i><p>No questions found.</p></div>`;
       return;
     }
 
@@ -217,7 +613,7 @@ async function loadQuestions() {
             <span class="ml-3 text-sm text-gray-500">${batchQuestions.length} questions</span>
           </div>
           <div class="flex gap-3">
-            <button onclick="editBatch('${batchId}')" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg flex items-center gap-2">
+            <button onclick="editBatch('${batchId}')" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg flex items-center gap-2">
               <i class="fas fa-edit"></i> Edit Entire Batch
             </button>
             <button onclick="deleteBatch('${batchId}')" class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg flex items-center gap-2">
@@ -241,7 +637,7 @@ async function loadQuestions() {
               <p class="text-xs text-gray-500 mt-1">${q.exam} • ${q.year} • ${q.paper || ''}</p>
             </div>
             <div class="flex gap-2">
-              <button onclick="editQuestion('${q._id}')" class="px-4 py-2 text-blue-600 hover:bg-blue-100 rounded-lg">✏️</button>
+              <button onclick="editQuestion('${q._id}')" class="px-4 py-2 text-indigo-600 hover:bg-indigo-100 rounded-lg">✏️</button>
               <button onclick="deleteQuestion('${q._id}')" class="px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">🗑️</button>
             </div>
           </div>
@@ -272,7 +668,6 @@ async function deleteBatch(batchId) {
   }
 }
 
-// ... (rest of your existing functions remain unchanged)
 async function editQuestion(id) {
   currentEditId = id;
   try {
@@ -280,17 +675,17 @@ async function editQuestion(id) {
     const q = await res.json();
     const formHTML = `
       <div class="grid grid-cols-2 gap-4">
-        <div><label class="block text-sm font-medium mb-1">Exam</label><input id="edit_exam" value="${q.exam}" class="w-full p-3 border rounded-lg"></div>
-        <div><label class="block text-sm font-medium mb-1">Year</label><input id="edit_year" type="number" value="${q.year}" class="w-full p-3 border rounded-lg"></div>
+        <div><label class="field-label">Exam</label><input id="edit_exam" value="${q.exam}" class="input-base"></div>
+        <div><label class="field-label">Year</label><input id="edit_year" type="number" value="${q.year}" class="input-base"></div>
       </div>
-      <div class="mt-4"><label class="block text-sm font-medium mb-1">Paper</label><input id="edit_paper" value="${q.paper || ''}" class="w-full p-3 border rounded-lg"></div>
-      <div class="mt-4"><label class="block text-sm font-medium mb-1">Question No (_id)</label><input id="edit_qno" type="number" value="${q._id}" class="w-full p-3 border rounded-lg"></div>
-      <div class="mt-6"><h4 class="font-semibold mb-2">English</h4><textarea id="edit_eng_q" rows="3" class="w-full p-3 border rounded-lg">${q.english.question}</textarea></div>
-      <div class="mt-6"><h4 class="font-semibold mb-2">Hindi</h4><textarea id="edit_hin_q" rows="3" class="w-full p-3 border rounded-lg">${q.hindi.question}</textarea></div>
+      <div class="mt-4"><label class="field-label">Paper</label><input id="edit_paper" value="${q.paper || ''}" class="input-base"></div>
+      <div class="mt-4"><label class="field-label">Question No (_id)</label><input id="edit_qno" type="number" value="${q._id}" class="input-base"></div>
+      <div class="mt-6"><h4 class="font-semibold mb-2">English</h4><textarea id="edit_eng_q" rows="3" class="input-base">${q.english.question}</textarea></div>
+      <div class="mt-6"><h4 class="font-semibold mb-2">Hindi</h4><textarea id="edit_hin_q" rows="3" class="input-base">${q.hindi.question}</textarea></div>
       <div class="mt-6 grid grid-cols-3 gap-4">
-        <div><label class="block text-sm">Marks</label><input id="edit_marks" type="number" value="${q.marks}" class="w-full p-3 border rounded-lg"></div>
-        <div><label class="block text-sm">Negative Marks</label><input id="edit_neg" type="number" value="${q.negativeMarks}" step="0.01" class="w-full p-3 border rounded-lg"></div>
-        <div><label class="block text-sm">Correct Answer</label><input id="edit_answer" type="number" value="${q.correct_answer}" class="w-full p-3 border rounded-lg"></div>
+        <div><label class="field-label">Marks</label><input id="edit_marks" type="number" value="${q.marks}" class="input-base"></div>
+        <div><label class="field-label">Negative Marks</label><input id="edit_neg" type="number" value="${q.negativeMarks}" step="0.01" class="input-base"></div>
+        <div><label class="field-label">Correct Answer</label><input id="edit_answer" type="number" value="${q.correct_answer}" class="input-base"></div>
       </div>
     `;
     document.getElementById('editForm').innerHTML = formHTML;
@@ -348,13 +743,429 @@ async function deleteQuestion(id) {
   }
 }
 
+/* ===================================================================== */
+/* SECTION 2: CURRENT AFFAIRS                                            */
+/* ===================================================================== */
+async function submitCurrentAffair() {
+  const title = document.getElementById('ca_title').value.trim();
+  const date = document.getElementById('ca_date').value.trim();
+  const subject = document.getElementById('ca_subject').value.trim();
+  const imgUrl = document.getElementById('ca_imgUrl').value.trim();
+  const overview = document.getElementById('ca_overview').value.trim();
+  const highlights = getDynRowValues('ca_highlights_rows');
+
+  if (!title || !date || !subject || !overview) {
+    return alert('Please fill in Title, Date, Subject, and Overview');
+  }
+
+  const payload = { title, date, subject, overview, highlights };
+  if (imgUrl) payload.imgUrl = imgUrl;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/current-affairs`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert('✅ Current affair added successfully!');
+      document.getElementById('ca_title').value = '';
+      document.getElementById('ca_date').value = '';
+      document.getElementById('ca_subject').value = '';
+      document.getElementById('ca_imgUrl').value = '';
+      document.getElementById('ca_overview').value = '';
+      clearDynRows('ca_highlights_rows');
+      addDynRow('ca_highlights_rows', 'text', 'Add a highlight point...');
+      loadCurrentAffairs();
+    } else {
+      alert(result.error || 'Failed to add current affair');
+    }
+  } catch (err) {
+    alert('Error submitting current affair');
+    console.error(err);
+  }
+}
+
+async function loadCurrentAffairs() {
+  try {
+    const search = document.getElementById('ca_search').value.trim();
+    const subject = document.getElementById('ca_filter_subject').value.trim();
+    const date = document.getElementById('ca_filter_date').value.trim();
+
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (subject) params.set('subject', subject);
+    if (date) params.set('date', date);
+    params.set('limit', '100');
+
+    const res = await fetch(`${API_BASE}/api/admin/current-affairs?${params.toString()}`, { headers: getHeaders() });
+    const result = await res.json();
+    const items = result.data || [];
+
+    document.getElementById('count-ca').textContent = result.total ?? items.length;
+    document.getElementById('ca_total_label').textContent = `${result.total ?? items.length} total`;
+
+    const container = document.getElementById('caList');
+    container.innerHTML = '';
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-newspaper text-3xl mb-3"></i><p>No current affairs found.</p></div>`;
+      return;
+    }
+
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'question-card bg-white border rounded-xl p-5';
+      const highlightsHTML = (item.highlights || []).slice(0, 3).map(h => `<li class="text-xs text-gray-500">• ${escapeHtml(h)}</li>`).join('');
+      card.innerHTML = `
+        <div class="flex justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-semibold bg-amber-50 text-amber-700 px-2 py-1 rounded">${escapeHtml(item.subject)}</span>
+              <span class="text-xs text-gray-400">${escapeHtml(item.date)}</span>
+            </div>
+            <h4 class="mt-2 font-semibold text-gray-800">${escapeHtml(item.title)}</h4>
+            <p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(item.overview)}</p>
+            ${highlightsHTML ? `<ul class="mt-2 space-y-0.5">${highlightsHTML}</ul>` : ''}
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            <button onclick="editCurrentAffair('${item._id}')" class="px-4 py-2 text-amber-600 hover:bg-amber-100 rounded-lg">✏️</button>
+            <button onclick="deleteCurrentAffair('${item._id}')" class="px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">🗑️</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    alert('Failed to load current affairs');
+    console.error(err);
+  }
+}
+
+async function editCurrentAffair(id) {
+  currentEditId = id;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/current-affairs/${id}`, { headers: getHeaders() });
+    const item = await res.json();
+
+    const formHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="field-label">Title</label><input id="caedit_title" value="${escapeAttr(item.title)}" class="input-base"></div>
+        <div><label class="field-label">Date</label><input id="caedit_date" type="date" value="${escapeAttr(item.date)}" class="input-base"></div>
+        <div><label class="field-label">Subject</label><input id="caedit_subject" value="${escapeAttr(item.subject)}" class="input-base"></div>
+        <div><label class="field-label">Image URL</label><input id="caedit_imgUrl" value="${escapeAttr(item.imgUrl || '')}" class="input-base"></div>
+      </div>
+      <div class="mt-4"><label class="field-label">Overview</label><textarea id="caedit_overview" rows="3" class="input-base">${escapeHtml(item.overview)}</textarea></div>
+      <div class="mt-4">
+        <label class="field-label">Highlights</label>
+        <div id="caedit_highlights_rows" class="space-y-2"></div>
+        <button type="button" class="add-row-btn mt-2" onclick="addDynRow('caedit_highlights_rows','text','Add a highlight point...')">
+          <i class="fas fa-plus"></i> Add Highlight
+        </button>
+      </div>
+    `;
+    document.getElementById('caEditForm').innerHTML = formHTML;
+    clearDynRows('caedit_highlights_rows');
+    (item.highlights || []).forEach(h => addDynRow('caedit_highlights_rows', 'text', 'Add a highlight point...', h));
+    if ((item.highlights || []).length === 0) addDynRow('caedit_highlights_rows', 'text', 'Add a highlight point...');
+
+    document.getElementById('caEditModal').classList.remove('hidden');
+  } catch (err) {
+    alert('Failed to load current affair');
+  }
+}
+
+async function saveCAEdit() {
+  const payload = {
+    title: document.getElementById('caedit_title').value.trim(),
+    date: document.getElementById('caedit_date').value.trim(),
+    subject: document.getElementById('caedit_subject').value.trim(),
+    imgUrl: document.getElementById('caedit_imgUrl').value.trim() || null,
+    overview: document.getElementById('caedit_overview').value.trim(),
+    highlights: getDynRowValues('caedit_highlights_rows')
+  };
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/current-affairs/${currentEditId}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      alert('Current affair updated');
+      closeCAModal();
+      loadCurrentAffairs();
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Save failed');
+    }
+  } catch (err) {
+    alert('Save failed');
+  }
+}
+
+function closeCAModal() {
+  document.getElementById('caEditModal').classList.add('hidden');
+}
+
+async function deleteCurrentAffair(id) {
+  if (!confirm('Delete this current affair?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/current-affairs/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (res.ok) {
+      alert('Current affair deleted');
+      loadCurrentAffairs();
+    }
+  } catch (err) {
+    alert('Delete failed');
+  }
+}
+
+async function bulkDeleteCA(mode) {
+  let params = new URLSearchParams();
+  if (mode === 'subject') {
+    const subject = document.getElementById('ca_bulk_subject').value.trim();
+    if (!subject) return alert('Enter a subject to bulk delete by');
+    params.set('subject', subject);
+  } else {
+    const date = document.getElementById('ca_bulk_date').value.trim();
+    if (!date) return alert('Pick a date to bulk delete by');
+    params.set('date', date);
+  }
+  if (!confirm(`Bulk delete all current affairs matching this ${mode}?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/current-affairs?${params.toString()}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert(`✅ Deleted ${result.deletedCount} item(s)`);
+      loadCurrentAffairs();
+    } else {
+      alert(result.error || 'Bulk delete failed');
+    }
+  } catch (err) {
+    alert('Bulk delete failed');
+  }
+}
+
+/* ===================================================================== */
+/* SECTION 3: IMPORTANT TOPICS                                           */
+/* ===================================================================== */
+async function submitImportantTopic() {
+  const title = document.getElementById('it_title').value.trim();
+  const subject = document.getElementById('it_subject').value.trim();
+  const points = getDynRowValues('it_points_rows');
+
+  if (!title || !subject) {
+    return alert('Please fill in Title and Subject');
+  }
+  if (points.length === 0) {
+    return alert('Please add at least one point');
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/important-topics`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ title, subject, points })
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert('✅ Important topic added successfully!');
+      document.getElementById('it_title').value = '';
+      document.getElementById('it_subject').value = '';
+      clearDynRows('it_points_rows');
+      addDynRow('it_points_rows', 'text', 'Add a point...');
+      loadImportantTopics();
+    } else {
+      alert(result.error || 'Failed to add important topic');
+    }
+  } catch (err) {
+    alert('Error submitting important topic');
+    console.error(err);
+  }
+}
+
+async function loadImportantTopics() {
+  try {
+    const search = document.getElementById('it_search').value.trim();
+    const subject = document.getElementById('it_filter_subject').value.trim();
+
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (subject) params.set('subject', subject);
+    params.set('limit', '100');
+
+    const res = await fetch(`${API_BASE}/api/admin/important-topics?${params.toString()}`, { headers: getHeaders() });
+    const result = await res.json();
+    const items = result.data || [];
+
+    document.getElementById('count-it').textContent = result.total ?? items.length;
+    document.getElementById('it_total_label').textContent = `${result.total ?? items.length} total`;
+
+    const container = document.getElementById('itList');
+    container.innerHTML = '';
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-lightbulb text-3xl mb-3"></i><p>No important topics found.</p></div>`;
+      return;
+    }
+
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'question-card bg-white border rounded-xl p-5';
+      const pointsHTML = (item.points || []).slice(0, 4).map(p => `<li class="text-xs text-gray-500">• ${escapeHtml(p)}</li>`).join('');
+      card.innerHTML = `
+        <div class="flex justify-between gap-4">
+          <div class="flex-1">
+            <span class="text-xs font-semibold bg-emerald-50 text-emerald-700 px-2 py-1 rounded">${escapeHtml(item.subject)}</span>
+            <h4 class="mt-2 font-semibold text-gray-800">${escapeHtml(item.title)}</h4>
+            ${pointsHTML ? `<ul class="mt-2 space-y-0.5">${pointsHTML}</ul>` : ''}
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            <button onclick="editImportantTopic('${item._id}')" class="px-4 py-2 text-emerald-600 hover:bg-emerald-100 rounded-lg">✏️</button>
+            <button onclick="deleteImportantTopic('${item._id}')" class="px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">🗑️</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    alert('Failed to load important topics');
+    console.error(err);
+  }
+}
+
+async function editImportantTopic(id) {
+  currentEditId = id;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/important-topics/${id}`, { headers: getHeaders() });
+    const item = await res.json();
+
+    const formHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="field-label">Title</label><input id="itedit_title" value="${escapeAttr(item.title)}" class="input-base"></div>
+        <div><label class="field-label">Subject</label><input id="itedit_subject" value="${escapeAttr(item.subject)}" class="input-base"></div>
+      </div>
+      <div class="mt-4">
+        <label class="field-label">Points</label>
+        <div id="itedit_points_rows" class="space-y-2"></div>
+        <button type="button" class="add-row-btn mt-2" onclick="addDynRow('itedit_points_rows','text','Add a point...')">
+          <i class="fas fa-plus"></i> Add Point
+        </button>
+      </div>
+    `;
+    document.getElementById('itEditForm').innerHTML = formHTML;
+    clearDynRows('itedit_points_rows');
+    (item.points || []).forEach(p => addDynRow('itedit_points_rows', 'text', 'Add a point...', p));
+    if ((item.points || []).length === 0) addDynRow('itedit_points_rows', 'text', 'Add a point...');
+
+    document.getElementById('itEditModal').classList.remove('hidden');
+  } catch (err) {
+    alert('Failed to load important topic');
+  }
+}
+
+async function saveITEdit() {
+  const payload = {
+    title: document.getElementById('itedit_title').value.trim(),
+    subject: document.getElementById('itedit_subject').value.trim(),
+    points: getDynRowValues('itedit_points_rows')
+  };
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/important-topics/${currentEditId}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      alert('Important topic updated');
+      closeITModal();
+      loadImportantTopics();
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Save failed');
+    }
+  } catch (err) {
+    alert('Save failed');
+  }
+}
+
+function closeITModal() {
+  document.getElementById('itEditModal').classList.add('hidden');
+}
+
+async function deleteImportantTopic(id) {
+  if (!confirm('Delete this important topic?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/important-topics/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (res.ok) {
+      alert('Important topic deleted');
+      loadImportantTopics();
+    }
+  } catch (err) {
+    alert('Delete failed');
+  }
+}
+
+async function bulkDeleteIT() {
+  const subject = document.getElementById('it_bulk_subject').value.trim();
+  if (!subject) return alert('Enter a subject to bulk delete by');
+  if (!confirm(`Bulk delete all important topics with subject "${subject}"?`)) return;
+
+  try {
+    const params = new URLSearchParams({ subject });
+    const res = await fetch(`${API_BASE}/api/admin/important-topics?${params.toString()}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert(`✅ Deleted ${result.deletedCount} item(s)`);
+      loadImportantTopics();
+    } else {
+      alert(result.error || 'Bulk delete failed');
+    }
+  } catch (err) {
+    alert('Bulk delete failed');
+  }
+}
+
+/* ===================================================================== */
+/* UTILITIES                                                             */
+/* ===================================================================== */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+function escapeAttr(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 window.onload = () => {
   const savedToken = localStorage.getItem('adminToken');
   if (savedToken) {
     token = savedToken;
     document.getElementById('loginScreen').classList.add('hidden');
     document.getElementById('dashboard').classList.remove('hidden');
-    loadQuestions();
+    initDashboard();
   }
 };
 </script>
