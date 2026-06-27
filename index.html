@@ -449,46 +449,21 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         <div id="tip_single_form">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="field-label">Title</label>
-              <input type="text" id="tip_title" class="input-base" placeholder="e.g. India's first satellite Aryabhata launched">
-            </div>
-            <div>
-              <label class="field-label">Category</label>
-              <input type="text" id="tip_category" class="input-base" placeholder="e.g. Science &amp; Tech">
-            </div>
-            <div>
-              <label class="field-label">Month</label>
-              <select id="tip_month" class="input-base">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-              </select>
-            </div>
-            <div>
-              <label class="field-label">Day</label>
-              <input type="number" id="tip_day" min="1" max="31" class="input-base" placeholder="e.g. 19">
+              <label class="field-label">Date</label>
+              <input type="date" id="tip_date" class="input-base">
             </div>
             <div>
               <label class="field-label">Year</label>
-              <input type="number" id="tip_year" class="input-base" placeholder="e.g. 1975">
+              <input type="text" id="tip_year" class="input-base" placeholder="e.g. 1975">
             </div>
             <div>
-              <label class="field-label">Image URL <span class="text-gray-400 font-normal">(optional)</span></label>
-              <input type="text" id="tip_imgUrl" class="input-base" placeholder="https://...">
+              <label class="field-label">Subject</label>
+              <input type="text" id="tip_subject" class="input-base" placeholder="e.g. Science &amp; Tech">
             </div>
           </div>
           <div class="mt-4">
-            <label class="field-label">Description</label>
-            <textarea id="tip_description" rows="3" class="input-base" placeholder="Describe the historical event..."></textarea>
+            <label class="field-label">Event</label>
+            <textarea id="tip_event" rows="3" class="input-base" placeholder="Describe the historical event..."></textarea>
           </div>
           <button onclick="submitTodayInPast()" class="mt-6 bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-sky-100">
             <i class="fas fa-paper-plane mr-2"></i>Submit Today In Past Event
@@ -498,12 +473,10 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         <div id="tip_bulk_form" class="hidden">
           <textarea id="tip_bulk_json" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-400" placeholder='[
   {
-    "title": "India&#39;s first satellite Aryabhata launched",
-    "month": 4,
-    "day": 19,
-    "year": 1975,
-    "category": "Science & Tech",
-    "description": "Aryabhata, India&#39;s first satellite, was launched by the Soviet Union on this day."
+    "date": "2026-04-19",
+    "year": "1975",
+    "subject": "Science & Tech",
+    "event": "Aryabhata, India&#39;s first satellite, was launched by the Soviet Union on this day."
   }
 ]'></textarea>
           <button onclick="uploadTodayInPastBulk()" class="mt-4 bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-sky-100">
@@ -515,34 +488,16 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
       <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
         <div class="flex flex-wrap gap-3 items-end">
           <div class="flex-1 min-w-[180px]">
-            <label class="field-label">Search by title</label>
-            <input type="text" id="tip_search" class="input-base" placeholder="Search title..." oninput="debouncedLoadTIP()">
+            <label class="field-label">Search by event</label>
+            <input type="text" id="tip_search" class="input-base" placeholder="Search event..." oninput="debouncedLoadTIP()">
           </div>
           <div class="min-w-[160px]">
-            <label class="field-label">Filter by category</label>
-            <input type="text" id="tip_filter_category" class="input-base" placeholder="Category" oninput="debouncedLoadTIP()">
+            <label class="field-label">Filter by subject</label>
+            <input type="text" id="tip_filter_subject" class="input-base" placeholder="Subject" oninput="debouncedLoadTIP()">
           </div>
-          <div class="min-w-[140px]">
-            <label class="field-label">Filter by month</label>
-            <select id="tip_filter_month" class="input-base" onchange="loadTodayInPast()">
-              <option value="">All</option>
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
-            </select>
-          </div>
-          <div class="min-w-[120px]">
-            <label class="field-label">Filter by day</label>
-            <input type="number" id="tip_filter_day" min="1" max="31" class="input-base" placeholder="Day" onchange="loadTodayInPast()">
+          <div class="min-w-[160px]">
+            <label class="field-label">Filter by date</label>
+            <input type="date" id="tip_filter_date" class="input-base" onchange="loadTodayInPast()">
           </div>
           <button onclick="loadTodayInPast()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700">
             <i class="fas fa-rotate mr-1"></i> Refresh
@@ -550,24 +505,10 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         </div>
         <div class="flex flex-wrap gap-3 items-end mt-4 pt-4 border-t border-gray-100">
           <span class="text-sm font-semibold text-gray-500 mr-1">Bulk delete:</span>
-          <input type="text" id="tip_bulk_category" class="input-base max-w-[200px]" placeholder="By category...">
-          <button onclick="bulkDeleteTIP('category')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Category</button>
-          <select id="tip_bulk_month" class="input-base max-w-[180px]">
-            <option value="">Select Month</option>
-            <option value="1">January</option>
-            <option value="2">February</option>
-            <option value="3">March</option>
-            <option value="4">April</option>
-            <option value="5">May</option>
-            <option value="6">June</option>
-            <option value="7">July</option>
-            <option value="8">August</option>
-            <option value="9">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-          <button onclick="bulkDeleteTIP('month')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Month</button>
+          <input type="text" id="tip_bulk_subject" class="input-base max-w-[200px]" placeholder="By subject...">
+          <button onclick="bulkDeleteTIP('subject')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Subject</button>
+          <input type="date" id="tip_bulk_date" class="input-base max-w-[200px]">
+          <button onclick="bulkDeleteTIP('date')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Date</button>
         </div>
       </div>
 
@@ -656,7 +597,6 @@ let token = null;
 let currentEditId = null;
 let currentCollection = 'pcsquestions';
 const API_BASE = 'https://pcsadmin.vercel.app';
-const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 async function login() {
   const admin_id = document.getElementById('admin_id').value.trim();
@@ -1656,20 +1596,16 @@ async function bulkDeleteDYK() {
 }
 
 async function submitTodayInPast() {
-  const title = document.getElementById('tip_title').value.trim();
-  const category = document.getElementById('tip_category').value.trim();
-  const month = parseInt(document.getElementById('tip_month').value);
-  const day = parseInt(document.getElementById('tip_day').value);
-  const year = parseInt(document.getElementById('tip_year').value);
-  const imgUrl = document.getElementById('tip_imgUrl').value.trim();
-  const description = document.getElementById('tip_description').value.trim();
+  const date = document.getElementById('tip_date').value.trim();
+  const year = document.getElementById('tip_year').value.trim();
+  const subject = document.getElementById('tip_subject').value.trim();
+  const event = document.getElementById('tip_event').value.trim();
 
-  if (!title || !category || !day || !year || !description) {
-    return alert('Please fill in Title, Category, Month, Day, Year, and Description');
+  if (!date || !year || !subject || !event) {
+    return alert('Please fill in Date, Year, Subject, and Event');
   }
 
-  const payload = { title, category, month, day, year, description };
-  if (imgUrl) payload.imgUrl = imgUrl;
+  const payload = { date, year, subject, event };
 
   try {
     const res = await fetch(`${API_BASE}/api/admin/today-in-past`, {
@@ -1680,12 +1616,10 @@ async function submitTodayInPast() {
     const result = await res.json();
     if (res.ok) {
       alert('✅ Today In Past event added successfully!');
-      document.getElementById('tip_title').value = '';
-      document.getElementById('tip_category').value = '';
-      document.getElementById('tip_day').value = '';
+      document.getElementById('tip_date').value = '';
       document.getElementById('tip_year').value = '';
-      document.getElementById('tip_imgUrl').value = '';
-      document.getElementById('tip_description').value = '';
+      document.getElementById('tip_subject').value = '';
+      document.getElementById('tip_event').value = '';
       loadTodayInPast();
     } else {
       alert(result.error || 'Failed to add Today In Past event');
@@ -1724,15 +1658,13 @@ async function uploadTodayInPastBulk() {
 async function loadTodayInPast() {
   try {
     const search = document.getElementById('tip_search').value.trim();
-    const category = document.getElementById('tip_filter_category').value.trim();
-    const month = document.getElementById('tip_filter_month').value.trim();
-    const day = document.getElementById('tip_filter_day').value.trim();
+    const subject = document.getElementById('tip_filter_subject').value.trim();
+    const date = document.getElementById('tip_filter_date').value.trim();
 
     const params = new URLSearchParams();
     if (search) params.set('search', search);
-    if (category) params.set('category', category);
-    if (month) params.set('month', month);
-    if (day) params.set('day', day);
+    if (subject) params.set('subject', subject);
+    if (date) params.set('date', date);
     params.set('limit', '100');
 
     const res = await fetch(`${API_BASE}/api/admin/today-in-past?${params.toString()}`, { headers: getHeaders() });
@@ -1753,16 +1685,14 @@ async function loadTodayInPast() {
     items.forEach(item => {
       const card = document.createElement('div');
       card.className = 'question-card bg-white border rounded-xl p-5';
-      const dateLabel = `${MONTH_NAMES[item.month] || ''} ${item.day}, ${item.year}`;
       card.innerHTML = `
         <div class="flex justify-between gap-4">
           <div class="flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-xs font-semibold bg-sky-50 text-sky-700 px-2 py-1 rounded">${escapeHtml(item.category)}</span>
-              <span class="text-xs text-gray-400">${escapeHtml(dateLabel)}</span>
+              <span class="text-xs font-semibold bg-sky-50 text-sky-700 px-2 py-1 rounded">${escapeHtml(item.subject)}</span>
+              <span class="text-xs text-gray-400">${escapeHtml(item.date)} • ${escapeHtml(item.year)}</span>
             </div>
-            <h4 class="mt-2 font-semibold text-gray-800">${escapeHtml(item.title)}</h4>
-            <p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(item.description)}</p>
+            <p class="mt-2 text-sm text-gray-700 line-clamp-2">${escapeHtml(item.event)}</p>
           </div>
           <div class="flex gap-2 flex-shrink-0">
             <button onclick="editTodayInPast('${item._id}')" class="px-4 py-2 text-sky-600 hover:bg-sky-100 rounded-lg">✏️</button>
@@ -1784,21 +1714,13 @@ async function editTodayInPast(id) {
     const res = await fetch(`${API_BASE}/api/admin/today-in-past/${id}`, { headers: getHeaders() });
     const item = await res.json();
 
-    const monthOptions = MONTH_NAMES.map((name, idx) => {
-      if (idx === 0) return '';
-      return `<option value="${idx}" ${idx === item.month ? 'selected' : ''}>${name}</option>`;
-    }).join('');
-
     const formHTML = `
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div><label class="field-label">Title</label><input id="tipedit_title" value="${escapeAttr(item.title)}" class="input-base"></div>
-        <div><label class="field-label">Category</label><input id="tipedit_category" value="${escapeAttr(item.category)}" class="input-base"></div>
-        <div><label class="field-label">Month</label><select id="tipedit_month" class="input-base">${monthOptions}</select></div>
-        <div><label class="field-label">Day</label><input id="tipedit_day" type="number" min="1" max="31" value="${item.day}" class="input-base"></div>
-        <div><label class="field-label">Year</label><input id="tipedit_year" type="number" value="${item.year}" class="input-base"></div>
-        <div><label class="field-label">Image URL</label><input id="tipedit_imgUrl" value="${escapeAttr(item.imgUrl || '')}" class="input-base"></div>
+        <div><label class="field-label">Date</label><input id="tipedit_date" type="date" value="${escapeAttr(item.date)}" class="input-base"></div>
+        <div><label class="field-label">Year</label><input id="tipedit_year" value="${escapeAttr(item.year)}" class="input-base"></div>
+        <div><label class="field-label">Subject</label><input id="tipedit_subject" value="${escapeAttr(item.subject)}" class="input-base"></div>
       </div>
-      <div class="mt-4"><label class="field-label">Description</label><textarea id="tipedit_description" rows="3" class="input-base">${escapeHtml(item.description)}</textarea></div>
+      <div class="mt-4"><label class="field-label">Event</label><textarea id="tipedit_event" rows="3" class="input-base">${escapeHtml(item.event)}</textarea></div>
     `;
     document.getElementById('tipEditForm').innerHTML = formHTML;
     document.getElementById('tipEditModal').classList.remove('hidden');
@@ -1809,13 +1731,10 @@ async function editTodayInPast(id) {
 
 async function saveTIPEdit() {
   const payload = {
-    title: document.getElementById('tipedit_title').value.trim(),
-    category: document.getElementById('tipedit_category').value.trim(),
-    month: parseInt(document.getElementById('tipedit_month').value),
-    day: parseInt(document.getElementById('tipedit_day').value),
-    year: parseInt(document.getElementById('tipedit_year').value),
-    imgUrl: document.getElementById('tipedit_imgUrl').value.trim() || null,
-    description: document.getElementById('tipedit_description').value.trim()
+    date: document.getElementById('tipedit_date').value.trim(),
+    year: document.getElementById('tipedit_year').value.trim(),
+    subject: document.getElementById('tipedit_subject').value.trim(),
+    event: document.getElementById('tipedit_event').value.trim()
   };
   try {
     const res = await fetch(`${API_BASE}/api/admin/today-in-past/${currentEditId}`, {
@@ -1858,14 +1777,14 @@ async function deleteTodayInPast(id) {
 
 async function bulkDeleteTIP(mode) {
   let params = new URLSearchParams();
-  if (mode === 'category') {
-    const category = document.getElementById('tip_bulk_category').value.trim();
-    if (!category) return alert('Enter a category to bulk delete by');
-    params.set('category', category);
+  if (mode === 'subject') {
+    const subject = document.getElementById('tip_bulk_subject').value.trim();
+    if (!subject) return alert('Enter a subject to bulk delete by');
+    params.set('subject', subject);
   } else {
-    const month = document.getElementById('tip_bulk_month').value.trim();
-    if (!month) return alert('Select a month to bulk delete by');
-    params.set('month', month);
+    const date = document.getElementById('tip_bulk_date').value.trim();
+    if (!date) return alert('Pick a date to bulk delete by');
+    params.set('date', date);
   }
   if (!confirm(`Bulk delete all Today In Past events matching this ${mode}?`)) return;
 
