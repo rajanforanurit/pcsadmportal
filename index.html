@@ -144,6 +144,10 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         <i class="fas fa-circle-question"></i> Did You Know
         <span class="tab-count" id="count-dyk">0</span>
       </button>
+      <button class="tab-btn" id="tabBtn-tip" onclick="switchTab('tip')">
+        <i class="fas fa-clock-rotate-left"></i> Today In Past
+        <span class="tab-count" id="count-tip">0</span>
+      </button>
     </div>
   </div>
 
@@ -424,6 +428,156 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
       <div id="dykList" class="space-y-4"></div>
     </div>
 
+    <div id="panel-tip" class="section-panel">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="section-badge bg-sky-100 text-sky-600"><i class="fas fa-clock-rotate-left"></i></div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Today In Past Manager</h2>
+          <p class="text-sm text-gray-500">Add and manage historical "on this day" events</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+          <h3 class="text-lg font-semibold"><i class="fas fa-plus-circle text-sky-500 mr-2"></i>Add Today In Past Event</h3>
+          <div class="inline-flex rounded-lg border border-sky-200 overflow-hidden text-sm font-medium">
+            <button type="button" onclick="setTIPMode('single')" id="tipModeBtn-single" class="px-4 py-2 bg-sky-600 text-white">Single Entry</button>
+            <button type="button" onclick="setTIPMode('bulk')" id="tipModeBtn-bulk" class="px-4 py-2 bg-white text-sky-700">Bulk JSON</button>
+          </div>
+        </div>
+
+        <div id="tip_single_form">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label">Title</label>
+              <input type="text" id="tip_title" class="input-base" placeholder="e.g. India's first satellite Aryabhata launched">
+            </div>
+            <div>
+              <label class="field-label">Category</label>
+              <input type="text" id="tip_category" class="input-base" placeholder="e.g. Science &amp; Tech">
+            </div>
+            <div>
+              <label class="field-label">Month</label>
+              <select id="tip_month" class="input-base">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Day</label>
+              <input type="number" id="tip_day" min="1" max="31" class="input-base" placeholder="e.g. 19">
+            </div>
+            <div>
+              <label class="field-label">Year</label>
+              <input type="number" id="tip_year" class="input-base" placeholder="e.g. 1975">
+            </div>
+            <div>
+              <label class="field-label">Image URL <span class="text-gray-400 font-normal">(optional)</span></label>
+              <input type="text" id="tip_imgUrl" class="input-base" placeholder="https://...">
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="field-label">Description</label>
+            <textarea id="tip_description" rows="3" class="input-base" placeholder="Describe the historical event..."></textarea>
+          </div>
+          <button onclick="submitTodayInPast()" class="mt-6 bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-sky-100">
+            <i class="fas fa-paper-plane mr-2"></i>Submit Today In Past Event
+          </button>
+        </div>
+
+        <div id="tip_bulk_form" class="hidden">
+          <textarea id="tip_bulk_json" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-400" placeholder='[
+  {
+    "title": "India&#39;s first satellite Aryabhata launched",
+    "month": 4,
+    "day": 19,
+    "year": 1975,
+    "category": "Science & Tech",
+    "description": "Aryabhata, India&#39;s first satellite, was launched by the Soviet Union on this day."
+  }
+]'></textarea>
+          <button onclick="uploadTodayInPastBulk()" class="mt-4 bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-sky-100">
+            <i class="fas fa-upload mr-2"></i>Upload Bulk Today In Past
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
+        <div class="flex flex-wrap gap-3 items-end">
+          <div class="flex-1 min-w-[180px]">
+            <label class="field-label">Search by title</label>
+            <input type="text" id="tip_search" class="input-base" placeholder="Search title..." oninput="debouncedLoadTIP()">
+          </div>
+          <div class="min-w-[160px]">
+            <label class="field-label">Filter by category</label>
+            <input type="text" id="tip_filter_category" class="input-base" placeholder="Category" oninput="debouncedLoadTIP()">
+          </div>
+          <div class="min-w-[140px]">
+            <label class="field-label">Filter by month</label>
+            <select id="tip_filter_month" class="input-base" onchange="loadTodayInPast()">
+              <option value="">All</option>
+              <option value="1">January</option>
+              <option value="2">February</option>
+              <option value="3">March</option>
+              <option value="4">April</option>
+              <option value="5">May</option>
+              <option value="6">June</option>
+              <option value="7">July</option>
+              <option value="8">August</option>
+              <option value="9">September</option>
+              <option value="10">October</option>
+              <option value="11">November</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="min-w-[120px]">
+            <label class="field-label">Filter by day</label>
+            <input type="number" id="tip_filter_day" min="1" max="31" class="input-base" placeholder="Day" onchange="loadTodayInPast()">
+          </div>
+          <button onclick="loadTodayInPast()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700">
+            <i class="fas fa-rotate mr-1"></i> Refresh
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-3 items-end mt-4 pt-4 border-t border-gray-100">
+          <span class="text-sm font-semibold text-gray-500 mr-1">Bulk delete:</span>
+          <input type="text" id="tip_bulk_category" class="input-base max-w-[200px]" placeholder="By category...">
+          <button onclick="bulkDeleteTIP('category')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Category</button>
+          <select id="tip_bulk_month" class="input-base max-w-[180px]">
+            <option value="">Select Month</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+          <button onclick="bulkDeleteTIP('month')" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Month</button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Today In Past List</h2>
+        <span class="stat-pill text-xs font-semibold text-indigo-700 px-3 py-1.5 rounded-full" id="tip_total_label">0 total</span>
+      </div>
+      <div id="tipList" class="space-y-4"></div>
+    </div>
+
   </div>
 </div>
 
@@ -483,11 +637,26 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
   </div>
 </div>
 
+<div id="tipEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
+    <div class="p-6 border-b flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center"><i class="fas fa-pen"></i></div>
+      <h3 class="text-xl font-semibold">Edit Today In Past Event</h3>
+    </div>
+    <div class="p-6" id="tipEditForm"></div>
+    <div class="p-6 border-t flex justify-end gap-3">
+      <button onclick="closeTIPModal()" class="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+      <button onclick="saveTIPEdit()" class="px-6 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let token = null;
 let currentEditId = null;
 let currentCollection = 'pcsquestions';
 const API_BASE = 'https://pcsadmin.vercel.app';
+const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 async function login() {
   const admin_id = document.getElementById('admin_id').value.trim();
@@ -530,7 +699,7 @@ function getHeaders() {
 }
 
 function switchTab(tab) {
-  ['pcs','ca','it','dyk'].forEach(t => {
+  ['pcs','ca','it','dyk','tip'].forEach(t => {
     document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
     document.getElementById(`tabBtn-${t}`).classList.toggle('active', t === tab);
   });
@@ -538,6 +707,7 @@ function switchTab(tab) {
   if (tab === 'ca') loadCurrentAffairs();
   if (tab === 'it') loadImportantTopics();
   if (tab === 'dyk') loadDidYouKnow();
+  if (tab === 'tip') loadTodayInPast();
 }
 
 function initDashboard() {
@@ -546,6 +716,7 @@ function initDashboard() {
   loadCurrentAffairs();
   loadImportantTopics();
   loadDidYouKnow();
+  loadTodayInPast();
   addDynRow('ca_highlights_rows', 'text', 'Add a highlight point...');
 }
 
@@ -604,6 +775,7 @@ function debounce(fn, delay = 400) {
 const debouncedLoadCA = debounce(() => loadCurrentAffairs(), 400);
 const debouncedLoadIT = debounce(() => loadImportantTopics(), 400);
 const debouncedLoadDYK = debounce(() => loadDidYouKnow(), 400);
+const debouncedLoadTIP = debounce(() => loadTodayInPast(), 400);
 
 function setCAMode(mode) {
   const single = document.getElementById('ca_single_form');
@@ -638,6 +810,24 @@ function setDYKMode(mode) {
     bulk.classList.remove('hidden');
     btnSingle.className = 'px-4 py-2 bg-white text-rose-700';
     btnBulk.className = 'px-4 py-2 bg-rose-600 text-white';
+  }
+}
+
+function setTIPMode(mode) {
+  const single = document.getElementById('tip_single_form');
+  const bulk = document.getElementById('tip_bulk_form');
+  const btnSingle = document.getElementById('tipModeBtn-single');
+  const btnBulk = document.getElementById('tipModeBtn-bulk');
+  if (mode === 'single') {
+    single.classList.remove('hidden');
+    bulk.classList.add('hidden');
+    btnSingle.className = 'px-4 py-2 bg-sky-600 text-white';
+    btnBulk.className = 'px-4 py-2 bg-white text-sky-700';
+  } else {
+    single.classList.add('hidden');
+    bulk.classList.remove('hidden');
+    btnSingle.className = 'px-4 py-2 bg-white text-sky-700';
+    btnBulk.className = 'px-4 py-2 bg-sky-600 text-white';
   }
 }
 
@@ -1457,6 +1647,237 @@ async function bulkDeleteDYK() {
     if (res.ok) {
       alert(`✅ Deleted ${result.deletedCount} item(s)`);
       loadDidYouKnow();
+    } else {
+      alert(result.error || 'Bulk delete failed');
+    }
+  } catch (err) {
+    alert('Bulk delete failed');
+  }
+}
+
+async function submitTodayInPast() {
+  const title = document.getElementById('tip_title').value.trim();
+  const category = document.getElementById('tip_category').value.trim();
+  const month = parseInt(document.getElementById('tip_month').value);
+  const day = parseInt(document.getElementById('tip_day').value);
+  const year = parseInt(document.getElementById('tip_year').value);
+  const imgUrl = document.getElementById('tip_imgUrl').value.trim();
+  const description = document.getElementById('tip_description').value.trim();
+
+  if (!title || !category || !day || !year || !description) {
+    return alert('Please fill in Title, Category, Month, Day, Year, and Description');
+  }
+
+  const payload = { title, category, month, day, year, description };
+  if (imgUrl) payload.imgUrl = imgUrl;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/today-in-past`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert('✅ Today In Past event added successfully!');
+      document.getElementById('tip_title').value = '';
+      document.getElementById('tip_category').value = '';
+      document.getElementById('tip_day').value = '';
+      document.getElementById('tip_year').value = '';
+      document.getElementById('tip_imgUrl').value = '';
+      document.getElementById('tip_description').value = '';
+      loadTodayInPast();
+    } else {
+      alert(result.error || 'Failed to add Today In Past event');
+    }
+  } catch (err) {
+    alert('Error submitting Today In Past event');
+    console.error(err);
+  }
+}
+
+async function uploadTodayInPastBulk() {
+  const jsonText = document.getElementById('tip_bulk_json').value.trim();
+  if (!jsonText) return alert('Please paste JSON data');
+
+  try {
+    const data = JSON.parse(jsonText);
+
+    const res = await fetch(`${API_BASE}/api/admin/today-in-past`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert(`✅ ${result.count || 1} Today In Past event(s) uploaded successfully!`);
+      document.getElementById('tip_bulk_json').value = '';
+      loadTodayInPast();
+    } else {
+      alert(result.error || 'Upload failed');
+    }
+  } catch (err) {
+    alert('Invalid JSON format');
+  }
+}
+
+async function loadTodayInPast() {
+  try {
+    const search = document.getElementById('tip_search').value.trim();
+    const category = document.getElementById('tip_filter_category').value.trim();
+    const month = document.getElementById('tip_filter_month').value.trim();
+    const day = document.getElementById('tip_filter_day').value.trim();
+
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (category) params.set('category', category);
+    if (month) params.set('month', month);
+    if (day) params.set('day', day);
+    params.set('limit', '100');
+
+    const res = await fetch(`${API_BASE}/api/admin/today-in-past?${params.toString()}`, { headers: getHeaders() });
+    const result = await res.json();
+    const items = result.data || [];
+
+    document.getElementById('count-tip').textContent = result.total ?? items.length;
+    document.getElementById('tip_total_label').textContent = `${result.total ?? items.length} total`;
+
+    const container = document.getElementById('tipList');
+    container.innerHTML = '';
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-clock-rotate-left text-3xl mb-3"></i><p>No Today In Past events found.</p></div>`;
+      return;
+    }
+
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'question-card bg-white border rounded-xl p-5';
+      const dateLabel = `${MONTH_NAMES[item.month] || ''} ${item.day}, ${item.year}`;
+      card.innerHTML = `
+        <div class="flex justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-semibold bg-sky-50 text-sky-700 px-2 py-1 rounded">${escapeHtml(item.category)}</span>
+              <span class="text-xs text-gray-400">${escapeHtml(dateLabel)}</span>
+            </div>
+            <h4 class="mt-2 font-semibold text-gray-800">${escapeHtml(item.title)}</h4>
+            <p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(item.description)}</p>
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            <button onclick="editTodayInPast('${item._id}')" class="px-4 py-2 text-sky-600 hover:bg-sky-100 rounded-lg">✏️</button>
+            <button onclick="deleteTodayInPast('${item._id}')" class="px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">🗑️</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    alert('Failed to load Today In Past events');
+    console.error(err);
+  }
+}
+
+async function editTodayInPast(id) {
+  currentEditId = id;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/today-in-past/${id}`, { headers: getHeaders() });
+    const item = await res.json();
+
+    const monthOptions = MONTH_NAMES.map((name, idx) => {
+      if (idx === 0) return '';
+      return `<option value="${idx}" ${idx === item.month ? 'selected' : ''}>${name}</option>`;
+    }).join('');
+
+    const formHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="field-label">Title</label><input id="tipedit_title" value="${escapeAttr(item.title)}" class="input-base"></div>
+        <div><label class="field-label">Category</label><input id="tipedit_category" value="${escapeAttr(item.category)}" class="input-base"></div>
+        <div><label class="field-label">Month</label><select id="tipedit_month" class="input-base">${monthOptions}</select></div>
+        <div><label class="field-label">Day</label><input id="tipedit_day" type="number" min="1" max="31" value="${item.day}" class="input-base"></div>
+        <div><label class="field-label">Year</label><input id="tipedit_year" type="number" value="${item.year}" class="input-base"></div>
+        <div><label class="field-label">Image URL</label><input id="tipedit_imgUrl" value="${escapeAttr(item.imgUrl || '')}" class="input-base"></div>
+      </div>
+      <div class="mt-4"><label class="field-label">Description</label><textarea id="tipedit_description" rows="3" class="input-base">${escapeHtml(item.description)}</textarea></div>
+    `;
+    document.getElementById('tipEditForm').innerHTML = formHTML;
+    document.getElementById('tipEditModal').classList.remove('hidden');
+  } catch (err) {
+    alert('Failed to load Today In Past event');
+  }
+}
+
+async function saveTIPEdit() {
+  const payload = {
+    title: document.getElementById('tipedit_title').value.trim(),
+    category: document.getElementById('tipedit_category').value.trim(),
+    month: parseInt(document.getElementById('tipedit_month').value),
+    day: parseInt(document.getElementById('tipedit_day').value),
+    year: parseInt(document.getElementById('tipedit_year').value),
+    imgUrl: document.getElementById('tipedit_imgUrl').value.trim() || null,
+    description: document.getElementById('tipedit_description').value.trim()
+  };
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/today-in-past/${currentEditId}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      alert('Today In Past event updated');
+      closeTIPModal();
+      loadTodayInPast();
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Save failed');
+    }
+  } catch (err) {
+    alert('Save failed');
+  }
+}
+
+function closeTIPModal() {
+  document.getElementById('tipEditModal').classList.add('hidden');
+}
+
+async function deleteTodayInPast(id) {
+  if (!confirm('Delete this Today In Past event?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/today-in-past/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (res.ok) {
+      alert('Today In Past event deleted');
+      loadTodayInPast();
+    }
+  } catch (err) {
+    alert('Delete failed');
+  }
+}
+
+async function bulkDeleteTIP(mode) {
+  let params = new URLSearchParams();
+  if (mode === 'category') {
+    const category = document.getElementById('tip_bulk_category').value.trim();
+    if (!category) return alert('Enter a category to bulk delete by');
+    params.set('category', category);
+  } else {
+    const month = document.getElementById('tip_bulk_month').value.trim();
+    if (!month) return alert('Select a month to bulk delete by');
+    params.set('month', month);
+  }
+  if (!confirm(`Bulk delete all Today In Past events matching this ${mode}?`)) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/today-in-past?${params.toString()}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert(`✅ Deleted ${result.deletedCount} item(s)`);
+      loadTodayInPast();
     } else {
       alert(result.error || 'Bulk delete failed');
     }
