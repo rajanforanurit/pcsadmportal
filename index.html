@@ -140,6 +140,10 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
         <i class="fas fa-lightbulb"></i> Important Topics
         <span class="tab-count" id="count-it">0</span>
       </button>
+      <button class="tab-btn" id="tabBtn-dyk" onclick="switchTab('dyk')">
+        <i class="fas fa-circle-question"></i> Did You Know
+        <span class="tab-count" id="count-dyk">0</span>
+      </button>
     </div>
   </div>
 
@@ -170,9 +174,12 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
 
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-gray-700">Questions List</h2>
-        <button onclick="loadQuestions()" class="text-indigo-600 hover:text-indigo-700 flex items-center gap-2 text-sm font-medium">
-          <i class="fas fa-rotate"></i> Refresh
-        </button>
+        <div class="flex items-center gap-3">
+          <span class="stat-pill text-xs font-semibold text-indigo-700 px-3 py-1.5 rounded-full" id="pcs_total_label">0 total</span>
+          <button onclick="loadQuestions()" class="text-indigo-600 hover:text-indigo-700 flex items-center gap-2 text-sm font-medium">
+            <i class="fas fa-rotate"></i> Refresh
+          </button>
+        </div>
       </div>
 
       <div id="questionsList" class="space-y-4"></div>
@@ -188,39 +195,63 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
       </div>
 
       <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
-        <h3 class="text-lg font-semibold mb-4"><i class="fas fa-plus-circle text-amber-500 mr-2"></i>Add New Current Affair</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="field-label">Title</label>
-            <input type="text" id="ca_title" class="input-base" placeholder="e.g. RBI revises repo rate">
-          </div>
-          <div>
-            <label class="field-label">Date</label>
-            <input type="date" id="ca_date" class="input-base">
-          </div>
-          <div>
-            <label class="field-label">Subject</label>
-            <input type="text" id="ca_subject" class="input-base" placeholder="e.g. Economy">
-          </div>
-          <div>
-            <label class="field-label">Image URL <span class="text-gray-400 font-normal">(optional)</span></label>
-            <input type="text" id="ca_imgUrl" class="input-base" placeholder="https://...">
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+          <h3 class="text-lg font-semibold"><i class="fas fa-plus-circle text-amber-500 mr-2"></i>Add Current Affair</h3>
+          <div class="inline-flex rounded-lg border border-amber-200 overflow-hidden text-sm font-medium">
+            <button type="button" onclick="setCAMode('single')" id="caModeBtn-single" class="px-4 py-2 bg-amber-600 text-white">Single Entry</button>
+            <button type="button" onclick="setCAMode('bulk')" id="caModeBtn-bulk" class="px-4 py-2 bg-white text-amber-700">Bulk JSON</button>
           </div>
         </div>
-        <div class="mt-4">
-          <label class="field-label">Overview</label>
-          <textarea id="ca_overview" rows="3" class="input-base" placeholder="Short overview / summary of this current affair..."></textarea>
-        </div>
-        <div class="mt-4">
-          <label class="field-label">Highlights</label>
-          <div id="ca_highlights_rows" class="space-y-2"></div>
-          <button type="button" class="add-row-btn mt-2" onclick="addDynRow('ca_highlights_rows','text','Add a highlight point...')">
-            <i class="fas fa-plus"></i> Add Highlight
+
+        <div id="ca_single_form">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label">Title</label>
+              <input type="text" id="ca_title" class="input-base" placeholder="e.g. RBI revises repo rate">
+            </div>
+            <div>
+              <label class="field-label">Date</label>
+              <input type="date" id="ca_date" class="input-base">
+            </div>
+            <div>
+              <label class="field-label">Subject</label>
+              <input type="text" id="ca_subject" class="input-base" placeholder="e.g. Economy">
+            </div>
+            <div>
+              <label class="field-label">Image URL <span class="text-gray-400 font-normal">(optional)</span></label>
+              <input type="text" id="ca_imgUrl" class="input-base" placeholder="https://...">
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="field-label">Overview</label>
+            <textarea id="ca_overview" rows="3" class="input-base" placeholder="Short overview / summary of this current affair..."></textarea>
+          </div>
+          <div class="mt-4">
+            <label class="field-label">Highlights</label>
+            <div id="ca_highlights_rows" class="space-y-2"></div>
+            <button type="button" class="add-row-btn mt-2" onclick="addDynRow('ca_highlights_rows','text','Add a highlight point...')">
+              <i class="fas fa-plus"></i> Add Highlight
+            </button>
+          </div>
+          <button onclick="submitCurrentAffair()" class="mt-6 bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-amber-100">
+            <i class="fas fa-paper-plane mr-2"></i>Submit Current Affair
           </button>
         </div>
-        <button onclick="submitCurrentAffair()" class="mt-6 bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-amber-100">
-          <i class="fas fa-paper-plane mr-2"></i>Submit Current Affair
-        </button>
+
+        <div id="ca_bulk_form" class="hidden">
+          <textarea id="ca_bulk_json" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm focus:outline-none focus:ring-2 focus:ring-amber-100 focus:border-amber-400" placeholder='[
+  {
+    "title": "RBI revises repo rate",
+    "date": "2026-06-27",
+    "subject": "Economy",
+    "overview": "Short overview here...",
+    "highlights": ["Point one", "Point two"]
+  }
+]'></textarea>
+          <button onclick="uploadCurrentAffairsBulk()" class="mt-4 bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-amber-100">
+            <i class="fas fa-upload mr-2"></i>Upload Bulk Current Affairs
+          </button>
+        </div>
       </div>
 
       <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
@@ -308,6 +339,91 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
       <div id="itList" class="space-y-4"></div>
     </div>
 
+    <div id="panel-dyk" class="section-panel">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="section-badge bg-rose-100 text-rose-600"><i class="fas fa-circle-question"></i></div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-800">Did You Know Manager</h2>
+          <p class="text-sm text-gray-500">Add and manage quick fact / trivia entries</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-6 mb-8 border border-gray-100">
+        <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
+          <h3 class="text-lg font-semibold"><i class="fas fa-plus-circle text-rose-500 mr-2"></i>Add Did You Know</h3>
+          <div class="inline-flex rounded-lg border border-rose-200 overflow-hidden text-sm font-medium">
+            <button type="button" onclick="setDYKMode('single')" id="dykModeBtn-single" class="px-4 py-2 bg-rose-600 text-white">Single Entry</button>
+            <button type="button" onclick="setDYKMode('bulk')" id="dykModeBtn-bulk" class="px-4 py-2 bg-white text-rose-700">Bulk JSON</button>
+          </div>
+        </div>
+
+        <div id="dyk_single_form">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label">Question</label>
+              <input type="text" id="dyk_question" class="input-base" placeholder="e.g. Which river is known as the 'Sorrow of Bihar'?">
+            </div>
+            <div>
+              <label class="field-label">Subject</label>
+              <input type="text" id="dyk_subject" class="input-base" placeholder="e.g. Geography">
+            </div>
+          </div>
+          <div class="mt-4">
+            <label class="field-label">Answer</label>
+            <input type="text" id="dyk_answer" class="input-base" placeholder="e.g. Kosi River">
+          </div>
+          <div class="mt-4">
+            <label class="field-label">Explanation</label>
+            <textarea id="dyk_explanation" rows="3" class="input-base" placeholder="Short explanation..."></textarea>
+          </div>
+          <button onclick="submitDidYouKnow()" class="mt-6 bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-rose-100">
+            <i class="fas fa-paper-plane mr-2"></i>Submit Did You Know
+          </button>
+        </div>
+
+        <div id="dyk_bulk_form" class="hidden">
+          <textarea id="dyk_bulk_json" rows="10" class="w-full p-4 border border-gray-300 rounded-xl font-mono text-sm focus:outline-none focus:ring-2 focus:ring-rose-100 focus:border-rose-400" placeholder='[
+  {
+    "question": "Which river is known as the &#39;Sorrow of Bihar&#39;?",
+    "answer": "Kosi River",
+    "explanation": "The Kosi River frequently changes its course, causing devastating floods in Bihar.",
+    "subject": "Geography"
+  }
+]'></textarea>
+          <button onclick="uploadDidYouKnowBulk()" class="mt-4 bg-rose-600 hover:bg-rose-700 text-white px-6 py-3 rounded-lg font-medium shadow shadow-rose-100">
+            <i class="fas fa-upload mr-2"></i>Upload Bulk Did You Know
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-5 mb-6 border border-gray-100">
+        <div class="flex flex-wrap gap-3 items-end">
+          <div class="flex-1 min-w-[180px]">
+            <label class="field-label">Search by question</label>
+            <input type="text" id="dyk_search" class="input-base" placeholder="Search question..." oninput="debouncedLoadDYK()">
+          </div>
+          <div class="min-w-[160px]">
+            <label class="field-label">Filter by subject</label>
+            <input type="text" id="dyk_filter_subject" class="input-base" placeholder="Subject" oninput="debouncedLoadDYK()">
+          </div>
+          <button onclick="loadDidYouKnow()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700">
+            <i class="fas fa-rotate mr-1"></i> Refresh
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-3 items-end mt-4 pt-4 border-t border-gray-100">
+          <span class="text-sm font-semibold text-gray-500 mr-1">Bulk delete:</span>
+          <input type="text" id="dyk_bulk_subject" class="input-base max-w-[200px]" placeholder="By subject...">
+          <button onclick="bulkDeleteDYK()" class="px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium border border-red-100">Delete by Subject</button>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Did You Know List</h2>
+        <span class="stat-pill text-xs font-semibold text-indigo-700 px-3 py-1.5 rounded-full" id="dyk_total_label">0 total</span>
+      </div>
+      <div id="dykList" class="space-y-4"></div>
+    </div>
+
   </div>
 </div>
 
@@ -353,6 +469,20 @@ body { font-family: 'Segoe UI', sans-serif; background:#f1f4f9; }
   </div>
 </div>
 
+<div id="dykEditModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-auto modal-scroll">
+    <div class="p-6 border-b flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center"><i class="fas fa-pen"></i></div>
+      <h3 class="text-xl font-semibold">Edit Did You Know</h3>
+    </div>
+    <div class="p-6" id="dykEditForm"></div>
+    <div class="p-6 border-t flex justify-end gap-3">
+      <button onclick="closeDYKModal()" class="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
+      <button onclick="saveDYKEdit()" class="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let token = null;
 let currentEditId = null;
@@ -363,7 +493,7 @@ async function login() {
   const admin_id = document.getElementById('admin_id').value.trim();
   const admin_pass = document.getElementById('admin_pass').value.trim();
   if (!admin_id || !admin_pass) return alert("Please enter Admin ID and Password");
-  
+
   try {
     const res = await fetch(`${API_BASE}/api/login`, {
       method: 'POST',
@@ -400,13 +530,14 @@ function getHeaders() {
 }
 
 function switchTab(tab) {
-  ['pcs','ca','it'].forEach(t => {
+  ['pcs','ca','it','dyk'].forEach(t => {
     document.getElementById(`panel-${t}`).classList.toggle('active', t === tab);
     document.getElementById(`tabBtn-${t}`).classList.toggle('active', t === tab);
   });
   if (tab === 'pcs') loadQuestions();
   if (tab === 'ca') loadCurrentAffairs();
   if (tab === 'it') loadImportantTopics();
+  if (tab === 'dyk') loadDidYouKnow();
 }
 
 function initDashboard() {
@@ -414,6 +545,7 @@ function initDashboard() {
   loadQuestions();
   loadCurrentAffairs();
   loadImportantTopics();
+  loadDidYouKnow();
   addDynRow('ca_highlights_rows', 'text', 'Add a highlight point...');
 }
 
@@ -471,28 +603,65 @@ function debounce(fn, delay = 400) {
 }
 const debouncedLoadCA = debounce(() => loadCurrentAffairs(), 400);
 const debouncedLoadIT = debounce(() => loadImportantTopics(), 400);
+const debouncedLoadDYK = debounce(() => loadDidYouKnow(), 400);
+
+function setCAMode(mode) {
+  const single = document.getElementById('ca_single_form');
+  const bulk = document.getElementById('ca_bulk_form');
+  const btnSingle = document.getElementById('caModeBtn-single');
+  const btnBulk = document.getElementById('caModeBtn-bulk');
+  if (mode === 'single') {
+    single.classList.remove('hidden');
+    bulk.classList.add('hidden');
+    btnSingle.className = 'px-4 py-2 bg-amber-600 text-white';
+    btnBulk.className = 'px-4 py-2 bg-white text-amber-700';
+  } else {
+    single.classList.add('hidden');
+    bulk.classList.remove('hidden');
+    btnSingle.className = 'px-4 py-2 bg-white text-amber-700';
+    btnBulk.className = 'px-4 py-2 bg-amber-600 text-white';
+  }
+}
+
+function setDYKMode(mode) {
+  const single = document.getElementById('dyk_single_form');
+  const bulk = document.getElementById('dyk_bulk_form');
+  const btnSingle = document.getElementById('dykModeBtn-single');
+  const btnBulk = document.getElementById('dykModeBtn-bulk');
+  if (mode === 'single') {
+    single.classList.remove('hidden');
+    bulk.classList.add('hidden');
+    btnSingle.className = 'px-4 py-2 bg-rose-600 text-white';
+    btnBulk.className = 'px-4 py-2 bg-white text-rose-700';
+  } else {
+    single.classList.add('hidden');
+    bulk.classList.remove('hidden');
+    btnSingle.className = 'px-4 py-2 bg-white text-rose-700';
+    btnBulk.className = 'px-4 py-2 bg-rose-600 text-white';
+  }
+}
 
 async function editBatch(batchId) {
   if (!confirm(`Edit entire batch ${batchId}?`)) return;
-  
+
   try {
     const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/batch/${batchId}/full`, {
       headers: getHeaders()
     });
-    
+
     if (!res.ok) {
       const err = await res.json();
       return alert(err.error || 'Failed to fetch batch');
     }
-    
+
     const data = await res.json();
-    
+
     document.getElementById('uploadJson').value = JSON.stringify(data.questions, null, 2);
-    
+
     alert(`✅ Batch ${batchId} loaded for editing!\n\nYou can now edit the JSON and click "Upload / Re-upload Questions"`);
-    
+
     document.getElementById('uploadJson').scrollIntoView({ behavior: 'smooth' });
-    
+
   } catch (err) {
     alert('Error loading batch for editing');
     console.error(err);
@@ -502,17 +671,17 @@ async function editBatch(batchId) {
 async function uploadQuestions() {
   const jsonText = document.getElementById('uploadJson').value.trim();
   if (!jsonText) return alert("Please paste JSON data");
-  
+
   try {
     const data = JSON.parse(jsonText);
     const collection = document.getElementById('collectionSelect').value;
-    
+
     const res = await fetch(`${API_BASE}/api/admin/questions/${collection}`, {
       method: 'POST',
       headers: getHeaders(),
       body: JSON.stringify(data)
     });
-    
+
     const result = await res.json();
     if (res.ok) {
       alert(`✅ ${result.count || 1} question(s) uploaded successfully! Batch ID: ${result.batchId}`);
@@ -534,8 +703,10 @@ async function loadQuestions() {
     const container = document.getElementById('questionsList');
     container.innerHTML = '';
 
-    document.getElementById('count-pcs').textContent = Array.isArray(questions) ? questions.length : 0;
-    
+    const total = Array.isArray(questions) ? questions.length : 0;
+    document.getElementById('count-pcs').textContent = total;
+    document.getElementById('pcs_total_label').textContent = `${total} total`;
+
     if (!Array.isArray(questions) || questions.length === 0) {
       container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox text-3xl mb-3"></i><p>No questions found.</p></div>`;
       return;
@@ -569,7 +740,7 @@ async function loadQuestions() {
         <div class="space-y-4" id="batch-${batchId}"></div>
       `;
       container.appendChild(batchDiv);
-      
+
       const batchContainer = document.getElementById(`batch-${batchId}`);
       batchQuestions.forEach(q => {
         const card = document.createElement('div');
@@ -726,6 +897,31 @@ async function submitCurrentAffair() {
   } catch (err) {
     alert('Error submitting current affair');
     console.error(err);
+  }
+}
+
+async function uploadCurrentAffairsBulk() {
+  const jsonText = document.getElementById('ca_bulk_json').value.trim();
+  if (!jsonText) return alert('Please paste JSON data');
+
+  try {
+    const data = JSON.parse(jsonText);
+
+    const res = await fetch(`${API_BASE}/api/admin/current-affairs`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert(`✅ ${result.count || 1} current affair(s) uploaded successfully!`);
+      document.getElementById('ca_bulk_json').value = '';
+      loadCurrentAffairs();
+    } else {
+      alert(result.error || 'Upload failed');
+    }
+  } catch (err) {
+    alert('Invalid JSON format');
   }
 }
 
@@ -1061,6 +1257,206 @@ async function bulkDeleteIT() {
     if (res.ok) {
       alert(`✅ Deleted ${result.deletedCount} item(s)`);
       loadImportantTopics();
+    } else {
+      alert(result.error || 'Bulk delete failed');
+    }
+  } catch (err) {
+    alert('Bulk delete failed');
+  }
+}
+
+async function submitDidYouKnow() {
+  const question = document.getElementById('dyk_question').value.trim();
+  const answer = document.getElementById('dyk_answer').value.trim();
+  const explanation = document.getElementById('dyk_explanation').value.trim();
+  const subject = document.getElementById('dyk_subject').value.trim();
+
+  if (!question || !answer || !explanation || !subject) {
+    return alert('Please fill in Question, Answer, Explanation, and Subject');
+  }
+
+  const payload = { question, answer, explanation, subject };
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/did-you-know`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert('✅ Did You Know item added successfully!');
+      document.getElementById('dyk_question').value = '';
+      document.getElementById('dyk_answer').value = '';
+      document.getElementById('dyk_explanation').value = '';
+      document.getElementById('dyk_subject').value = '';
+      loadDidYouKnow();
+    } else {
+      alert(result.error || 'Failed to add Did You Know item');
+    }
+  } catch (err) {
+    alert('Error submitting Did You Know item');
+    console.error(err);
+  }
+}
+
+async function uploadDidYouKnowBulk() {
+  const jsonText = document.getElementById('dyk_bulk_json').value.trim();
+  if (!jsonText) return alert('Please paste JSON data');
+
+  try {
+    const data = JSON.parse(jsonText);
+
+    const res = await fetch(`${API_BASE}/api/admin/did-you-know`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert(`✅ ${result.count || 1} Did You Know item(s) uploaded successfully!`);
+      document.getElementById('dyk_bulk_json').value = '';
+      loadDidYouKnow();
+    } else {
+      alert(result.error || 'Upload failed');
+    }
+  } catch (err) {
+    alert('Invalid JSON format');
+  }
+}
+
+async function loadDidYouKnow() {
+  try {
+    const search = document.getElementById('dyk_search').value.trim();
+    const subject = document.getElementById('dyk_filter_subject').value.trim();
+
+    const params = new URLSearchParams();
+    if (search) params.set('search', search);
+    if (subject) params.set('subject', subject);
+    params.set('limit', '100');
+
+    const res = await fetch(`${API_BASE}/api/admin/did-you-know?${params.toString()}`, { headers: getHeaders() });
+    const result = await res.json();
+    const items = result.data || [];
+
+    document.getElementById('count-dyk').textContent = result.total ?? items.length;
+    document.getElementById('dyk_total_label').textContent = `${result.total ?? items.length} total`;
+
+    const container = document.getElementById('dykList');
+    container.innerHTML = '';
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i class="fas fa-circle-question text-3xl mb-3"></i><p>No Did You Know items found.</p></div>`;
+      return;
+    }
+
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'question-card bg-white border rounded-xl p-5';
+      card.innerHTML = `
+        <div class="flex justify-between gap-4">
+          <div class="flex-1">
+            <span class="text-xs font-semibold bg-rose-50 text-rose-700 px-2 py-1 rounded">${escapeHtml(item.subject)}</span>
+            <h4 class="mt-2 font-semibold text-gray-800 line-clamp-2">${escapeHtml(item.question)}</h4>
+            <p class="text-sm text-gray-700 mt-1"><span class="font-semibold">Answer:</span> ${escapeHtml(item.answer)}</p>
+            <p class="text-sm text-gray-500 mt-1 line-clamp-2">${escapeHtml(item.explanation)}</p>
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            <button onclick="editDidYouKnow('${item._id}')" class="px-4 py-2 text-rose-600 hover:bg-rose-100 rounded-lg">✏️</button>
+            <button onclick="deleteDidYouKnow('${item._id}')" class="px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg">🗑️</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  } catch (err) {
+    alert('Failed to load Did You Know items');
+    console.error(err);
+  }
+}
+
+async function editDidYouKnow(id) {
+  currentEditId = id;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/did-you-know/${id}`, { headers: getHeaders() });
+    const item = await res.json();
+
+    const formHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div><label class="field-label">Question</label><input id="dykedit_question" value="${escapeAttr(item.question)}" class="input-base"></div>
+        <div><label class="field-label">Subject</label><input id="dykedit_subject" value="${escapeAttr(item.subject)}" class="input-base"></div>
+      </div>
+      <div class="mt-4"><label class="field-label">Answer</label><input id="dykedit_answer" value="${escapeAttr(item.answer)}" class="input-base"></div>
+      <div class="mt-4"><label class="field-label">Explanation</label><textarea id="dykedit_explanation" rows="3" class="input-base">${escapeHtml(item.explanation)}</textarea></div>
+    `;
+    document.getElementById('dykEditForm').innerHTML = formHTML;
+    document.getElementById('dykEditModal').classList.remove('hidden');
+  } catch (err) {
+    alert('Failed to load Did You Know item');
+  }
+}
+
+async function saveDYKEdit() {
+  const payload = {
+    question: document.getElementById('dykedit_question').value.trim(),
+    subject: document.getElementById('dykedit_subject').value.trim(),
+    answer: document.getElementById('dykedit_answer').value.trim(),
+    explanation: document.getElementById('dykedit_explanation').value.trim()
+  };
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/did-you-know/${currentEditId}`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      alert('Did You Know item updated');
+      closeDYKModal();
+      loadDidYouKnow();
+    } else {
+      const err = await res.json();
+      alert(err.error || 'Save failed');
+    }
+  } catch (err) {
+    alert('Save failed');
+  }
+}
+
+function closeDYKModal() {
+  document.getElementById('dykEditModal').classList.add('hidden');
+}
+
+async function deleteDidYouKnow(id) {
+  if (!confirm('Delete this Did You Know item?')) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/did-you-know/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    if (res.ok) {
+      alert('Did You Know item deleted');
+      loadDidYouKnow();
+    }
+  } catch (err) {
+    alert('Delete failed');
+  }
+}
+
+async function bulkDeleteDYK() {
+  const subject = document.getElementById('dyk_bulk_subject').value.trim();
+  if (!subject) return alert('Enter a subject to bulk delete by');
+  if (!confirm(`Bulk delete all Did You Know items with subject "${subject}"?`)) return;
+
+  try {
+    const params = new URLSearchParams({ subject });
+    const res = await fetch(`${API_BASE}/api/admin/did-you-know?${params.toString()}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    const result = await res.json();
+    if (res.ok) {
+      alert(`✅ Deleted ${result.deletedCount} item(s)`);
+      loadDidYouKnow();
     } else {
       alert(result.error || 'Bulk delete failed');
     }
