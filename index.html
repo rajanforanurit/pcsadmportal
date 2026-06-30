@@ -919,6 +919,7 @@ async function editQuestion(id) {
   try {
     const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}/${id}`, { headers: getHeaders() });
     const q = await res.json();
+    window._editQuestionOptions = { english: q.english.options, hindi: q.hindi.options }; // preserved silently, not shown in this simple form
     const formHTML = `
       <div class="grid grid-cols-2 gap-4">
         <div><label class="field-label">Exam</label><input id="edit_exam" value="${q.exam}" class="input-base"></div>
@@ -926,8 +927,18 @@ async function editQuestion(id) {
       </div>
       <div class="mt-4"><label class="field-label">Paper</label><input id="edit_paper" value="${q.paper || ''}" class="input-base"></div>
       <div class="mt-4"><label class="field-label">Question No (_id)</label><input id="edit_qno" type="number" value="${q._id}" class="input-base"></div>
-      <div class="mt-6"><h4 class="font-semibold mb-2">English</h4><textarea id="edit_eng_q" rows="3" class="input-base">${q.english.question}</textarea></div>
-      <div class="mt-6"><h4 class="font-semibold mb-2">Hindi</h4><textarea id="edit_hin_q" rows="3" class="input-base">${q.hindi.question}</textarea></div>
+      <div class="mt-6">
+        <h4 class="font-semibold mb-2">English</h4>
+        <textarea id="edit_eng_q" rows="3" class="input-base">${q.english.question}</textarea>
+        <label class="field-label mt-3">English Explanation</label>
+        <textarea id="edit_eng_exp" rows="3" class="input-base">${q.english.english_explanation || ''}</textarea>
+      </div>
+      <div class="mt-6">
+        <h4 class="font-semibold mb-2">Hindi</h4>
+        <textarea id="edit_hin_q" rows="3" class="input-base">${q.hindi.question}</textarea>
+        <label class="field-label mt-3">Hindi Explanation</label>
+        <textarea id="edit_hin_exp" rows="3" class="input-base">${q.hindi.hindi_explanation || ''}</textarea>
+      </div>
       <div class="mt-6 grid grid-cols-3 gap-4">
         <div><label class="field-label">Marks</label><input id="edit_marks" type="number" value="${q.marks}" class="input-base"></div>
         <div><label class="field-label">Negative Marks</label><input id="edit_neg" type="number" value="${q.negativeMarks}" step="0.01" class="input-base"></div>
@@ -947,8 +958,16 @@ async function saveEdit() {
     year: parseInt(document.getElementById('edit_year').value),
     paper: document.getElementById('edit_paper').value,
     _id: parseInt(document.getElementById('edit_qno').value),
-    english: { question: document.getElementById('edit_eng_q').value },
-    hindi: { question: document.getElementById('edit_hin_q').value },
+    english: {
+      question: document.getElementById('edit_eng_q').value,
+      options: window._editQuestionOptions.english,
+      english_explanation: document.getElementById('edit_eng_exp').value
+    },
+    hindi: {
+      question: document.getElementById('edit_hin_q').value,
+      options: window._editQuestionOptions.hindi,
+      hindi_explanation: document.getElementById('edit_hin_exp').value
+    },
     marks: parseFloat(document.getElementById('edit_marks').value),
     negativeMarks: parseFloat(document.getElementById('edit_neg').value),
     correct_answer: parseInt(document.getElementById('edit_answer').value)
