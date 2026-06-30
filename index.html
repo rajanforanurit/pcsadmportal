@@ -828,16 +828,17 @@ async function uploadQuestions() {
 async function loadQuestions() {
   currentCollection = document.getElementById('collectionSelect').value;
   try {
-    const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}`, { headers: getHeaders() });
-    const questions = await res.json();
+    const res = await fetch(`${API_BASE}/api/admin/questions/${currentCollection}?limit=2000`, { headers: getHeaders() });
+    const result = await res.json();
+    const questions = result.data || [];
     const container = document.getElementById('questionsList');
     container.innerHTML = '';
 
-    const total = Array.isArray(questions) ? questions.length : 0;
+    const total = result.total ?? questions.length;
     document.getElementById('count-pcs').textContent = total;
     document.getElementById('pcs_total_label').textContent = `${total} total`;
 
-    if (!Array.isArray(questions) || questions.length === 0) {
+    if (questions.length === 0) {
       container.innerHTML = `<div class="empty-state"><i class="fas fa-inbox text-3xl mb-3"></i><p>No questions found.</p></div>`;
       return;
     }
